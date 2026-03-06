@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日文單字打字練習</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen font-sans flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden p-6 min-h-[500px] flex flex-col relative max-h-[90vh]">
+        
+        <!-- 頂部資訊：進度與計分 -->
+        <div id="header-info" class="hidden justify-between items-center mb-4 text-slate-500 font-medium w-full shrink-0">
+            <button onclick="quitQuiz()" class="text-slate-500 hover:text-rose-600 transition flex items-center gap-1 text-sm font-bold bg-slate-100 hover:bg-rose-100 px-3 py-1.5 rounded-lg">
+                🏠 首頁
+            </button>
+            <div id="progress">進度: 1 / 5</div>
+            <div class="text-indigo-600 font-bold" id="score">得分: 0</div>
+        </div>
+
+        <!-- 🌟 首頁：模式選擇區塊 -->
+        <div id="start-screen" class="flex flex-col items-center w-full flex-grow py-4 overflow-y-auto">
+            <h1 class="text-2xl font-bold text-slate-800 mb-2 shrink-0">日文單字特訓</h1>
+            <p class="text-slate-500 mb-6 text-sm shrink-0">請選擇您想要練習的模式</p>
+            
+            <!-- 單字級別與課別雙層選擇區塊 -->
+            <div class="w-full mb-3 shrink-0 flex flex-col sm:flex-row gap-3">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium text-slate-600 mb-2">單字級別：</label>
+                    <select id="jlpt-level" onchange="updateLessonDropdown()" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-slate-700 bg-white cursor-pointer font-bold">
+                        <option value="all">全部級別</option>
+                        <option value="N5">N5 (入門)</option>
+                        <option value="N4">N4 (初級)</option>
+                    </select>
+                </div>
+                
+                <!-- 動態顯示的課別選單 -->
+                <div class="flex-1 hidden" id="lesson-container">
+                    <label class="block text-sm font-medium text-slate-600 mb-2">課別：</label>
+                    <select id="lesson-select" onchange="updateWordCountDisplay()" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-slate-700 bg-white cursor-pointer font-bold">
+                        <option value="all">全部</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 目前範圍單字總數顯示卡片 -->
+            <div class="w-full bg-indigo-50 border border-indigo-100 text-indigo-700 px-4 py-3 rounded-xl mb-4 flex justify-between items-center shadow-sm shrink-0">
+                <span class="text-sm font-bold flex items-center gap-2">
+                    <span>📚</span> 該範圍單字總數：
+                </span>
+                <span id="total-words-badge" class="text-lg font-black">0 題</span>
+            </div>
+
+            <!-- 題數選擇區塊 (加入自訂選項) -->
+            <div class="w-full mb-4 shrink-0">
+                <label class="block text-sm font-medium text-slate-600 mb-2">測驗題數：</label>
+                <select id="question-count" onchange="toggleCustomCount()" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-slate-700 bg-white cursor-pointer font-bold mb-2">
+                    <option value="5">5 題 (快速暖身)</option>
+                    <option value="10">10 題 (小考)</option>
+                    <option value="20">20 題 (深度記憶)</option>
+                    <option value="all">全部單字</option>
+                    <option value="custom">✍️ 自訂題數...</option>
+                </select>
+                
+                <!-- 自訂題數輸入框 (預設隱藏) -->
+            <div id="custom-count-container" class="hidden">
+                <input type="number" id="custom-count-input" min="1" placeholder="請輸入題數 (例如: 15)" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-lg text-slate-700 bg-slate-50">
+            </div>
+        </div>
+
+        <!-- 🌟 模式選擇按鈕 (優化版：徹底修復窄螢幕文字跑版問題) -->
+        <div class="w-full space-y-3 mb-6 shrink-0">
+            <button onclick="startGame('zh-to-jp')" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border-2 border-blue-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between">
+                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🇹🇼</span>
+                <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">看中文 ➔ 打日文</span>
+                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">📝</span>
+            </button>
+            <button onclick="startGame('jp-to-zh')" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-2 border-emerald-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between">
+                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🇯🇵</span>
+                <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">看日文 ➔ 打中文</span>
+                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">📝</span>
+            </button>
+            <button onclick="startGame('audio')" class="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 border-2 border-purple-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between">
+                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🎧</span>
+                <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">聽發音 ➔ 打日、中</span>
+                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🗣️</span>
+            </button>
+            <button onclick="startGame('mixed')" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-700 border-2 border-amber-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between mt-2">
+                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🔀</span>
+                <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">綜合混合練習</span>
+                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🎲</span>
+            </button>
+        </div>
+
+        <!-- 歷史成績按鈕 -->
+        <button onclick="showHistoryList()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 px-4 rounded-xl font-bold transition flex items-center justify-center gap-2 shrink-0">
+                📊 查看歷史成績
+            </button>
+        </div>
+
+        <!-- 測驗主體區塊 -->
+        <div id="quiz-container" class="hidden flex-col items-center w-full flex-grow overflow-y-auto pb-4 px-1">
+            <span id="question-type-badge" class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold mb-4 shrink-0 mt-2">
+                題型標籤
+            </span>
+
+            <div id="prompt-area" class="w-full flex justify-center items-center min-h-[5rem] mb-6 text-center shrink-0">
+                <!-- 內容會由 JS 動態生成 -->
+            </div>
+
+            <div class="w-full space-y-4 mb-6 shrink-0">
+                <div id="jp-input-container">
+                    <label class="block text-sm font-medium text-slate-600 mb-1">輸入日文 (漢字或平假名)</label>
+                    <input type="text" id="input-jp" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-lg" placeholder="例：たべる 或 食べる" autocomplete="off">
+                </div>
+                
+                <div id="zh-input-container">
+                    <label class="block text-sm font-medium text-slate-600 mb-1">輸入中文意思</label>
+                    <input type="text" id="input-zh" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-lg" placeholder="請輸入中文..." autocomplete="off">
+                </div>
+            </div>
+
+            <button id="submit-btn" onclick="checkAnswer()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md mt-auto shrink-0">
+                送出答案
+            </button>
+
+            <!-- 批改與解答區塊 -->
+            <div id="feedback-box" class="hidden w-full mt-auto p-5 rounded-xl border-2 flex-col shrink-0">
+                <div id="feedback-title" class="text-xl font-bold mb-3 flex items-center gap-2"></div>
+                <div class="text-slate-700 space-y-2 mb-4 bg-white/50 p-3 rounded-lg">
+                    <p>日文： <span id="ans-word" class="font-bold text-lg"></span></p>
+                    <p>讀音： <span id="ans-kana" class="font-bold text-lg"></span></p>
+                    <p>中文： <span id="ans-zh" class="font-bold text-lg"></span></p>
+                </div>
+                <button onclick="nextQuestion()" id="next-btn" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-900 transition shadow-md">
+                    下一題
+                </button>
+            </div>
+        </div>
+
+        <!-- 結束畫面 -->
+        <div id="end-screen" class="hidden flex-col items-center justify-center py-8 flex-grow">
+            <h2 class="text-3xl font-bold text-slate-800 mb-4">練習完成！🎉</h2>
+            <p class="text-lg text-slate-600 mb-8">最終得分：<span id="final-score" class="font-bold text-indigo-600 text-2xl">0</span></p>
+            
+            <div class="w-full space-y-3">
+                <button onclick="showLatestHistoryDetail()" class="w-full bg-emerald-50 text-emerald-700 border-2 border-emerald-200 py-3 rounded-xl font-bold hover:bg-emerald-100 transition shadow-md">
+                    📝 檢討本次作答
+                </button>
+                <button onclick="restartSameMode()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md">
+                    🔄 再練習一次 (同模式)
+                </button>
+                <button onclick="backToMenu()" class="w-full bg-slate-200 text-slate-700 py-3 rounded-xl font-bold hover:bg-slate-300 transition">
+                    🏠 回主選單
+                </button>
+            </div>
+        </div>
+
+        <!-- 歷史成績列表畫面 -->
+        <div id="history-screen" class="hidden flex-col w-full flex-grow overflow-hidden">
+            <div class="flex items-center mb-4 shrink-0">
+                <button onclick="backToMenuFromHistory()" class="text-slate-500 hover:text-indigo-600 p-2 -ml-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <h2 class="text-xl font-bold text-slate-800 ml-2">歷史成績</h2>
+            </div>
+            <div id="history-list" class="w-full flex-grow overflow-y-auto space-y-3 pb-4 pr-1"></div>
+        </div>
+
+        <!-- 歷史成績詳細檢討畫面 -->
+        <div id="history-detail-screen" class="hidden flex-col w-full flex-grow overflow-hidden">
+            <div class="flex items-center mb-4 shrink-0">
+                <button onclick="backToHistoryList()" class="text-slate-500 hover:text-indigo-600 p-2 -ml-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <h2 class="text-xl font-bold text-slate-800 ml-2">作答檢討</h2>
+                <span id="detail-score-badge" class="ml-auto bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold"></span>
+            </div>
+            <div id="history-detail-list" class="w-full flex-grow overflow-y-auto space-y-4 pb-4 pr-1"></div>
+        </div>
+
+    </div>
+
+    <script>
+        // 🌟 你的題庫：包含 N5 與 N4(第二課) 單字
+        const wordList = [
+            // N5 單字 (不分課)
+            { word: "食べる", kana: "たべる", zh: "吃", level: "N5" },
+            { word: "飲む", kana: "のむ", zh: "喝", level: "N5" },
+            { word: "勉強", kana: "べんきょう", zh: "學習、讀書", level: "N5" },
+            { word: "猫", kana: "ねこ", zh: "貓咪", level: "N5" },
+            { word: "美味しい", kana: "おいしい", zh: "美味的、好吃的", level: "N5" },
+            { word: "行く", kana: "いく", zh: "去", level: "N5" },
+            { word: "来る", kana: "くる", zh: "來", level: "N5" },
+            { word: "見る", kana: "みる", zh: "看", level: "N5" },
+            { word: "寝る", kana: "ねる", zh: "睡覺", level: "N5" },
+            { word: "起きる", kana: "おきる", zh: "起床", level: "N5" },
+            { word: "買う", kana: "かう", zh: "買", level: "N5" },
+            { word: "待つ", kana: "まつ", zh: "等待", level: "N5" },
+            { word: "読む", kana: "よむ", zh: "閱讀", level: "N5" },
+            { word: "書く", kana: "かく", zh: "寫", level: "N5" },
+            { word: "聞く", kana: "きく", zh: "聽、問", level: "N5" },
+            { word: "新しい", kana: "あたらしい", zh: "新的", level: "N5" },
+            { word: "古い", kana: "ふるい", zh: "舊的", level: "N5" },
+            { word: "高い", kana: "たかい", zh: "高的、貴的", level: "N5" },
+            { word: "安い", kana: "やすい", zh: "便宜的", level: "N5" },
+            { word: "大きい", kana: "おおきい", zh: "大的", level: "N5" },
+            
+            // N4 單字 (指定為 第二課)
+            { word: "おかし作り", kana: "おかしづくり", zh: "製作點心", level: "N4", lesson: "2" },
+            { word: "すごい", kana: "すごい", zh: "厲害的, 棒的", level: "N4", lesson: "2" },
+            { word: "こんな", kana: "こんな", zh: "這樣的", level: "N4", lesson: "2" },
+            { word: "やる", kana: "やる", zh: "做, 幹", level: "N4", lesson: "2" },
+            { word: "旅館", kana: "りょかん", zh: "(日式)旅館", level: "N4", lesson: "2" },
+            { word: "とまる", kana: "とまる", zh: "住宿", level: "N4", lesson: "2" },
+            { word: "雪まつり", kana: "ゆきまつり", zh: "雪祭：每年 2 月在北海道札幌市舉行的祭典活動。", level: "N4", lesson: "2" },
+            { word: "まつり", kana: "まつり", zh: "節日, 慶典", level: "N4", lesson: "2" },
+            { word: "着物", kana: "きもの", zh: "和服", level: "N4", lesson: "2" },
+            { word: "どうしたんですか。", kana: "どうしたんですか。", zh: "怎麼了？", level: "N4", lesson: "2" },
+            { word: "気分", kana: "きぶん", zh: "心情; 氣氛", level: "N4", lesson: "2" },
+            { word: "悪い", kana: "わるい", zh: "壞, 不好", level: "N4", lesson: "2" },
+            { word: "ねつ", kana: "ねつ", zh: "發燒, 熱度; 熱情", level: "N4", lesson: "2" },
+            { word: "申込書", kana: "もうしこみしょ", zh: "申請書, 申請信", level: "N4", lesson: "2" },
+            { word: "事務所", kana: "じむしょ", zh: "辦公室, 事務所", level: "N4", lesson: "2" },
+            { word: "説明する", kana: "せつめいする", zh: "解釋, 說明", level: "N4", lesson: "2" },
+            { word: "わかる", kana: "わかる", zh: "知道, 明白", level: "N4", lesson: "2" },
+            { word: "教える", kana: "おしえる", zh: "教授; 告知", level: "N4", lesson: "2" },
+            { word: "あなた", kana: "あなた", zh: "你, 您：稱呼對方時使用的禮貌表達。", level: "N4", lesson: "2" },
+            { word: "スピーチ", kana: "スピーチ", zh: "演說, 演講", level: "N4", lesson: "2" },
+            { word: "事故", kana: "じこ", zh: "事故", level: "N4", lesson: "2" },
+            { word: "不便", kana: "ふべん", zh: "不方便, 不便", level: "N4", lesson: "2" },
+            { word: "こわれる", kana: "こわれる", zh: "壞, 破損", level: "N4", lesson: "2" },
+            { word: "フランス", kana: "フランス", zh: "法語", level: "N4", lesson: "2" },
+            { word: "すし", kana: "すし", zh: "壽司", level: "N4", lesson: "2" },
+            { word: "大人", kana: "おとな", zh: "大人, 成人", level: "N4", lesson: "2" },
+            { word: "出張", kana: "しゅっちょう", zh: "出差", level: "N4", lesson: "2" },
+            { word: "もうすぐ", kana: "もうすぐ", zh: "馬上, 將要, 快要", level: "N4", lesson: "2" },
+            { word: "思う", kana: "おもう", zh: "認為, 覺得", level: "N4", lesson: "2" },
+            { word: "まちがい", kana: "まちがい", zh: "錯誤, 差錯", level: "N4", lesson: "2" },
+            { word: "話", kana: "はなし", zh: "話; 說話", level: "N4", lesson: "2" },
+            { word: "本当", kana: "ほんとう", zh: "真的", level: "N4", lesson: "2" },
+            { word: "さがす", kana: "さがす", zh: "找", level: "N4", lesson: "2" },
+            { word: "電話する", kana: "でんわする", zh: "打電話", level: "N4", lesson: "2" },
+            { word: "かける", kana: "かける", zh: "蓋上(醬)", level: "N4", lesson: "2" },
+            { word: "よかった", kana: "よかった", zh: "太好了。", level: "N4", lesson: "2" },
+            { word: "ソース", kana: "ソース", zh: "醬, 蘸料", level: "N4", lesson: "2" },
+            { word: "フルーツ", kana: "フルーツ", zh: "水果", level: "N4", lesson: "2" },
+            { word: "かわ", kana: "かわ", zh: "(食物的)皮, 果皮", level: "N4", lesson: "2" },
+            { word: "むく", kana: "むく", zh: "削, 剝(皮)", level: "N4", lesson: "2" },
+            { word: "シートベルト", kana: "シートベルト", zh: "安全帶", level: "N4", lesson: "2" },
+            { word: "運転する", kana: "うんてんする", zh: "駕駛", level: "N4", lesson: "2" },
+            { word: "まど", kana: "まど", zh: "窗戶", level: "N4", lesson: "2" },
+            { word: "色えんぴつ", kana: "いろえんぴつ", zh: "彩色鉛筆", level: "N4", lesson: "2" },
+            { word: "さす", kana: "さす", zh: "撐/打(傘)", level: "N4", lesson: "2" },
+            { word: "ハイキング", kana: "ハイキング", zh: "徒步行走, 郊遊", level: "N4", lesson: "2" },
+            { word: "さいふ", kana: "さいふ", zh: "錢包", level: "N4", lesson: "2" },
+            { word: "さとう", kana: "さとう", zh: "砂糖, 白糖", level: "N4", lesson: "2" },
+            { word: "テキスト", kana: "テキスト", zh: "考試, 測驗", level: "N4", lesson: "2" },
+            { word: "ありがとうございました。", kana: "ありがとうございました。", zh: "謝謝了。", level: "N4", lesson: "2" },
+            { word: "イラスト", kana: "イラスト", zh: "插圖, 解說圖", level: "N4", lesson: "2" },
+            { word: "材料", kana: "ざいりょう", zh: "材料", level: "N4", lesson: "2" },
+            { word: "もし", kana: "もし", zh: "如果", level: "N4", lesson: "2" },
+            { word: "世界", kana: "せかい", zh: "世界", level: "N4", lesson: "2" },
+            { word: "困る", kana: "こまる", zh: "困擾, 傷腦筋", level: "N4", lesson: "2" },
+            { word: "ホワイトチョコレート", kana: "ホワイトチョコレート", zh: "白巧克力", level: "N4", lesson: "2" },
+            { word: "夕飯", kana: "ゆうはん", zh: "晚飯, 晚餐", level: "N4", lesson: "2" },
+            { word: "台風", kana: "たいふう", zh: "颱風", level: "N4", lesson: "2" },
+            { word: "試合", kana: "しあい", zh: "比賽", level: "N4", lesson: "2" },
+            { word: "めんきょ", kana: "めんきょ", zh: "駕照, 駕駛執照", level: "N4", lesson: "2" },
+            { word: "どうですか", kana: "どうですか", zh: "如何？", level: "N4", lesson: "2" },
+            { word: "近い", kana: "ちかい", zh: "近, 近的", level: "N4", lesson: "2" },
+            { word: "工場", kana: "こうじょう", zh: "工廠", level: "N4", lesson: "2" },
+            { word: "いつでも", kana: "いつでも", zh: "無論何時", level: "N4", lesson: "2" },
+            { word: "むすこ", kana: "むすこ", zh: "兒子", level: "N4", lesson: "2" },
+            { word: "見える", kana: "みえる", zh: "映入眼簾, 能看到", level: "N4", lesson: "2" },
+            { word: "聞こえる", kana: "きこえる", zh: "聽到, 能聽到", level: "N4", lesson: "2" },
+            { word: "赤ちゃん", kana: "あかちゃん", zh: "嬰兒, 寶寶", level: "N4", lesson: "2" },
+            { word: "声", kana: "こえ", zh: "聲音", level: "N4", lesson: "2" },
+            { word: "ラジオ", kana: "ラジオ", zh: "廣播", level: "N4", lesson: "2" },
+            { word: "ほうそう", kana: "ほうそう", zh: "廣播, 播送", level: "N4", lesson: "2" },
+            { word: "間に合う", kana: "まにあう", zh: "趕得上, 來得及", level: "N4", lesson: "2" },
+            { word: "おくれる", kana: "おくれる", zh: "遲, 遲到", level: "N4", lesson: "2" },
+            { word: "たしかめる", kana: "たしかめる", zh: "弄清, 查明, 確認", level: "N4", lesson: "2" },
+            { word: "忘れ物", kana: "わすれもの", zh: "遺忘的物品", level: "N4", lesson: "2" },
+            { word: "しゅうまつ", kana: "しゅうまつ", zh: "週末", level: "N4", lesson: "2" },
+            { word: "やくそく", kana: "やくそく", zh: "約定", level: "N4", lesson: "2" },
+            { word: "なぜなら", kana: "なぜなら", zh: "原因是～, 因為～", level: "N4", lesson: "2" },
+            { word: "それに", kana: "それに", zh: "並且", level: "N4", lesson: "2" },
+            { word: "ところが", kana: "ところが", zh: "然而, 可是, 不過", level: "N4", lesson: "2" },
+            { word: "それで", kana: "それで", zh: "於是, 所以", level: "N4", lesson: "2" },
+            { word: "フェスティバル", kana: "フェスティバル", zh: "節日, 慶典", level: "N4", lesson: "2" }
+        ];
+
+        // 課程資料設定
+        const lessonData = {
+            "N4": [
+                { value: "all", label: "全部 N4 單字" },
+                { value: "2", label: "第二課" }
+            ]
+        };
+
+        const modeNames = {
+            'zh-to-jp': '🇹🇼 看中文 ➔ 打日文',
+            'jp-to-zh': '🇯🇵 看日文 ➔ 打中文',
+            'audio': '🎧 聽發音',
+            'mixed': '🔀 綜合混合練習'
+        };
+
+        let currentIndex = 0;
+        let score = 0;
+        let selectedMode = 'mixed'; 
+        let currentQuestionType = 'zh-to-jp'; 
+        let preferredVoice = null;
+        let currentSessionDetails = [];
+        let currentQuizList = []; 
+
+        // DOM Elements
+        const startScreen = document.getElementById('start-screen');
+        const headerInfo = document.getElementById('header-info');
+        const quizContainer = document.getElementById('quiz-container');
+        const promptArea = document.getElementById('prompt-area');
+        const badge = document.getElementById('question-type-badge');
+        
+        const jpInputContainer = document.getElementById('jp-input-container');
+        const zhInputContainer = document.getElementById('zh-input-container');
+        const inputJp = document.getElementById('input-jp');
+        const inputZh = document.getElementById('input-zh');
+        
+        const submitBtn = document.getElementById('submit-btn');
+        const feedbackBox = document.getElementById('feedback-box');
+        const nextBtn = document.getElementById('next-btn');
+        const endScreen = document.getElementById('end-screen');
+        
+        const historyScreen = document.getElementById('history-screen');
+        const historyList = document.getElementById('history-list');
+        const historyDetailScreen = document.getElementById('history-detail-screen');
+        const historyDetailList = document.getElementById('history-detail-list');
+
+        document.addEventListener('keydown', function(event) {
+            if (event.isComposing || event.keyCode === 229) return;
+            if (event.repeat) return;
+
+            if (event.key === 'Enter') {
+                if (!quizContainer.classList.contains('hidden') && feedbackBox.classList.contains('hidden')) {
+                    const jpVal = inputJp.value.trim();
+                    const zhVal = inputZh.value.trim();
+                    let canSubmit = false;
+                    
+                    if (currentQuestionType === 'zh-to-jp') canSubmit = (jpVal !== '');
+                    else if (currentQuestionType === 'jp-to-zh') canSubmit = (zhVal !== '');
+                    else if (currentQuestionType === 'audio') canSubmit = (jpVal !== '' && zhVal !== '');
+
+                    if (canSubmit) {
+                        event.preventDefault();
+                        checkAnswer();
+                    }
+                } 
+                else if (!quizContainer.classList.contains('hidden') && !feedbackBox.classList.contains('hidden')) {
+                    event.preventDefault();
+                    nextQuestion();
+                }
+            }
+        });
+
+        function initVoices() {
+            const voices = window.speechSynthesis.getVoices();
+            const jpVoices = voices.filter(voice => voice.lang.includes('ja'));
+            if (jpVoices.length > 0) {
+                preferredVoice = jpVoices.find(voice => voice.name.includes('Natural')) ||
+                                 jpVoices.find(voice => voice.name.includes('Google')) ||
+                                 jpVoices.find(voice => voice.name.includes('Premium')) ||
+                                 jpVoices.find(voice => voice.name.includes('Kyoko')) ||
+                                 jpVoices.find(voice => voice.name.includes('Otoya')) ||
+                                 jpVoices[0];
+            }
+        }
+        window.speechSynthesis.onvoiceschanged = initVoices;
+
+        // 連動更新課別的選單
+        function updateLessonDropdown() {
+            const level = document.getElementById('jlpt-level').value;
+            const lessonContainer = document.getElementById('lesson-container');
+            const lessonSelect = document.getElementById('lesson-select');
+
+            if (lessonData[level]) {
+                lessonContainer.classList.remove('hidden');
+                lessonSelect.innerHTML = '';
+                lessonData[level].forEach(lesson => {
+                    const option = document.createElement('option');
+                    option.value = lesson.value;
+                    option.textContent = lesson.label;
+                    lessonSelect.appendChild(option);
+                });
+            } else {
+                lessonContainer.classList.add('hidden');
+                lessonSelect.innerHTML = '<option value="all">全部</option>';
+            }
+            
+            updateWordCountDisplay();
+        }
+
+        // 獲取過濾後的單字庫 (加入課別判斷)
+        function getFilteredWords() {
+            const level = document.getElementById('jlpt-level').value;
+            const lesson = document.getElementById('lesson-select').value;
+            
+            if (level === 'all') return wordList; 
+            
+            let filtered = wordList.filter(w => w.level === level);
+            
+            if (lesson !== 'all') {
+                filtered = filtered.filter(w => w.lesson === lesson);
+            }
+            
+            return filtered;
+        }
+
+        // 統一更新畫面上的「題庫總數」提示
+        function updateWordCountDisplay() {
+            const availableCount = getFilteredWords().length;
+            document.getElementById('total-words-badge').textContent = `${availableCount} 題`;
+        }
+
+        function toggleCustomCount() {
+            const select = document.getElementById('question-count');
+            const customContainer = document.getElementById('custom-count-container');
+            
+            if (select.value === 'custom') {
+                customContainer.classList.remove('hidden');
+                setTimeout(() => document.getElementById('custom-count-input').focus(), 100);
+            } else {
+                customContainer.classList.add('hidden');
+            }
+        }
+
+        function startGame(mode) {
+            const filteredWords = getFilteredWords();
+            
+            if (filteredWords.length === 0) {
+                const descP = document.querySelector('#start-screen p');
+                const oldText = descP.textContent;
+                descP.textContent = "⚠️ 此範圍目前沒有單字，請選擇其他級別或課別";
+                descP.classList.add('text-rose-500', 'font-bold');
+                descP.classList.remove('text-slate-500');
+                setTimeout(() => {
+                    descP.textContent = "請選擇您想要練習的模式";
+                    descP.classList.remove('text-rose-500', 'font-bold');
+                    descP.classList.add('text-slate-500');
+                }, 3000);
+                return;
+            }
+
+            selectedMode = mode;
+            currentIndex = 0;
+            score = 0;
+            currentSessionDetails = [];
+            document.getElementById('score').textContent = `得分: 0`;
+            
+            const countSelect = document.getElementById('question-count').value;
+            let count;
+            
+            if (countSelect === 'all') {
+                count = filteredWords.length;
+            } else if (countSelect === 'custom') {
+                const customInput = parseInt(document.getElementById('custom-count-input').value, 10);
+                if (isNaN(customInput) || customInput < 1) {
+                    count = Math.min(5, filteredWords.length);
+                } else if (customInput > filteredWords.length) {
+                    count = filteredWords.length;
+                } else {
+                    count = customInput;
+                }
+            } else {
+                count = parseInt(countSelect, 10);
+                if (count > filteredWords.length) count = filteredWords.length; 
+            }
+            
+            let shuffled = [...filteredWords].sort(() => 0.5 - Math.random());
+            currentQuizList = shuffled.slice(0, count);
+            
+            hideAllScreens();
+            
+            headerInfo.classList.remove('hidden');
+            headerInfo.classList.add('flex');
+            quizContainer.classList.remove('hidden');
+            quizContainer.classList.add('flex');
+
+            initVoices();
+            initQuestion();
+        }
+
+        function initQuestion() {
+            if (currentIndex >= currentQuizList.length) {
+                showEndScreen();
+                return;
+            }
+
+            const currentWord = currentQuizList[currentIndex];
+            document.getElementById('progress').textContent = `進度: ${currentIndex + 1} / ${currentQuizList.length}`;
+            
+            if (selectedMode === 'mixed') {
+                const types = ['zh-to-jp', 'jp-to-zh', 'audio'];
+                currentQuestionType = types[Math.floor(Math.random() * types.length)];
+            } else {
+                currentQuestionType = selectedMode;
+            }
+
+            inputJp.value = '';
+            inputZh.value = '';
+            inputJp.disabled = false;
+            inputZh.disabled = false;
+            submitBtn.classList.remove('hidden');
+            
+            feedbackBox.classList.add('hidden');
+            feedbackBox.classList.remove('flex');
+            
+            quizContainer.scrollTop = 0;
+            
+            if (currentQuestionType === 'zh-to-jp') {
+                badge.textContent = '📝 題型：看中文 ➔ 打日文';
+                badge.className = 'px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold mb-4 shrink-0 mt-2';
+                promptArea.innerHTML = `<h2 class="text-4xl font-bold text-slate-800">${currentWord.zh}</h2>`;
+                jpInputContainer.classList.remove('hidden');
+                zhInputContainer.classList.add('hidden');
+                setTimeout(() => inputJp.focus(), 100);
+
+            } else if (currentQuestionType === 'jp-to-zh') {
+                badge.textContent = '📝 題型：看日文 ➔ 打中文';
+                badge.className = 'px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold mb-4 shrink-0 mt-2';
+                promptArea.innerHTML = `<h2 class="text-4xl font-bold text-slate-800">${currentWord.word}</h2>`;
+                jpInputContainer.classList.add('hidden');
+                zhInputContainer.classList.remove('hidden');
+                setTimeout(() => inputZh.focus(), 100);
+
+            } else if (currentQuestionType === 'audio') {
+                badge.textContent = '🎧 題型：聽發音 ➔ 打日文與中文';
+                badge.className = 'px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold mb-4 shrink-0 mt-2';
+                promptArea.innerHTML = `
+                    <button onclick="playAudio()" class="flex items-center gap-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border-2 border-indigo-200 px-6 py-4 rounded-2xl transition shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z" />
+                        </svg>
+                        <span class="text-xl font-bold">點擊播放發音</span>
+                    </button>
+                `;
+                jpInputContainer.classList.remove('hidden');
+                zhInputContainer.classList.remove('hidden');
+                playAudio(); 
+                setTimeout(() => inputJp.focus(), 100);
+            }
+        }
+
+        function playAudio() {
+            window.speechSynthesis.cancel();
+            const textToRead = currentQuizList[currentIndex].word;
+            const utterance = new SpeechSynthesisUtterance(textToRead);
+            utterance.lang = "ja-JP"; 
+            if (preferredVoice) utterance.voice = preferredVoice;
+            utterance.rate = 0.85; 
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function checkAnswer() {
+            const currentWord = currentQuizList[currentIndex];
+            const userJp = inputJp.value.trim();
+            const userZh = inputZh.value.trim();
+
+            let isCorrect = false;
+            const jpCorrect = (userJp === currentWord.word || userJp === currentWord.kana);
+            const zhCorrect = (userZh !== '' && currentWord.zh.includes(userZh));
+
+            if (currentQuestionType === 'zh-to-jp') isCorrect = jpCorrect;
+            else if (currentQuestionType === 'jp-to-zh') isCorrect = zhCorrect;
+            else if (currentQuestionType === 'audio') isCorrect = jpCorrect && zhCorrect;
+
+            currentSessionDetails.push({
+                wordObj: currentWord,
+                type: currentQuestionType,
+                userJp: userJp,
+                userZh: userZh,
+                isCorrect: isCorrect
+            });
+
+            showFeedback(isCorrect, currentWord);
+        }
+
+        function showFeedback(isCorrect, currentWord) {
+            inputJp.disabled = true;
+            inputZh.disabled = true;
+            submitBtn.classList.add('hidden');
+            
+            feedbackBox.classList.remove('hidden');
+            feedbackBox.classList.add('flex');
+            
+            const titleEl = document.getElementById('feedback-title');
+            
+            if (isCorrect) {
+                score += 10;
+                document.getElementById('score').textContent = `得分: ${score}`;
+                feedbackBox.className = "flex w-full mt-auto p-5 rounded-xl border-2 flex-col border-emerald-300 bg-emerald-50 shrink-0";
+                titleEl.innerHTML = `<span>✅ 答對了！</span>`;
+                titleEl.className = "text-xl font-bold mb-3 flex items-center gap-2 text-emerald-700";
+            } else {
+                feedbackBox.className = "flex w-full mt-auto p-5 rounded-xl border-2 flex-col border-rose-300 bg-rose-50 shrink-0";
+                titleEl.innerHTML = `<span>❌ 答錯了或不完整</span>`;
+                titleEl.className = "text-xl font-bold mb-3 flex items-center gap-2 text-rose-700";
+            }
+
+            document.getElementById('ans-word').textContent = currentWord.word;
+            document.getElementById('ans-kana').textContent = currentWord.kana;
+            document.getElementById('ans-zh').textContent = currentWord.zh;
+            
+            playAudio();
+
+            setTimeout(() => {
+                quizContainer.scrollTo({
+                    top: quizContainer.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 50);
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            initQuestion();
+        }
+
+        function showEndScreen() {
+            hideAllScreens();
+            
+            document.getElementById('final-score').textContent = score;
+            endScreen.classList.remove('hidden');
+            endScreen.classList.add('flex');
+
+            saveToHistory();
+        }
+
+        function saveToHistory() {
+            if (currentSessionDetails.length === 0) return;
+
+            const newRecord = {
+                id: Date.now(),
+                date: new Date().toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }),
+                mode: selectedMode,
+                score: score,
+                totalQuestions: currentQuizList.length,
+                details: currentSessionDetails
+            };
+
+            let history = JSON.parse(localStorage.getItem('jpTypingHistory') || '[]');
+            history.unshift(newRecord);
+            if (history.length > 50) history.pop(); 
+            localStorage.setItem('jpTypingHistory', JSON.stringify(history));
+        }
+
+        function showHistoryList() {
+            hideAllScreens();
+            historyScreen.classList.remove('hidden');
+            historyScreen.classList.add('flex');
+            
+            const history = JSON.parse(localStorage.getItem('jpTypingHistory') || '[]');
+            historyList.innerHTML = '';
+
+            if (history.length === 0) {
+                historyList.innerHTML = `<div class="text-center text-slate-400 py-10">目前還沒有測驗紀錄喔！<br>趕快去練習吧！</div>`;
+                return;
+            }
+
+            history.forEach((record, index) => {
+                const item = document.createElement('div');
+                item.className = "bg-white border-2 border-slate-100 p-4 rounded-xl flex items-center justify-between cursor-pointer hover:border-indigo-300 hover:shadow-md transition";
+                item.onclick = () => showHistoryDetail(index);
+                
+                item.innerHTML = `
+                    <div>
+                        <div class="text-xs text-slate-400 mb-1">${record.date}</div>
+                        <div class="font-bold text-slate-700">${modeNames[record.mode] || '未知模式'}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xl font-bold ${record.score === record.totalQuestions * 10 ? 'text-emerald-500' : 'text-indigo-600'}">${record.score} <span class="text-sm font-normal text-slate-400">分</span></div>
+                    </div>
+                `;
+                historyList.appendChild(item);
+            });
+        }
+
+        function showHistoryDetail(index) {
+            const history = JSON.parse(localStorage.getItem('jpTypingHistory') || '[]');
+            const record = history[index];
+            if (!record) return;
+
+            hideAllScreens();
+            historyDetailScreen.classList.remove('hidden');
+            historyDetailScreen.classList.add('flex');
+
+            document.getElementById('detail-score-badge').textContent = `${record.score} 分`;
+            historyDetailList.innerHTML = '';
+
+            record.details.forEach((detail, i) => {
+                const isCorr = detail.isCorrect;
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-xl border-2 ${isCorr ? 'border-emerald-200 bg-emerald-50/30' : 'border-rose-200 bg-rose-50/50'}`;
+                
+                let userAnsHtml = '';
+                if (detail.type === 'zh-to-jp') {
+                    userAnsHtml = `<p class="text-sm text-slate-600">你的輸入：<span class="font-bold ${isCorr ? 'text-emerald-700' : 'text-rose-600'}">${detail.userJp || '(未填寫)'}</span></p>`;
+                } else if (detail.type === 'jp-to-zh') {
+                    userAnsHtml = `<p class="text-sm text-slate-600">你的輸入：<span class="font-bold ${isCorr ? 'text-emerald-700' : 'text-rose-600'}">${detail.userZh || '(未填寫)'}</span></p>`;
+                } else {
+                    userAnsHtml = `
+                        <p class="text-sm text-slate-600">日文輸入：<span class="font-bold ${detail.userJp ? (isCorr ? 'text-emerald-700' : 'text-rose-600') : 'text-rose-600'}">${detail.userJp || '(未填寫)'}</span></p>
+                        <p class="text-sm text-slate-600">中文輸入：<span class="font-bold ${detail.userZh ? (isCorr ? 'text-emerald-700' : 'text-rose-600') : 'text-rose-600'}">${detail.userZh || '(未填寫)'}</span></p>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="text-2xl mt-1">${isCorr ? '✅' : '❌'}</div>
+                        <div class="flex-grow space-y-2">
+                            <div class="flex items-center gap-2">
+                                <span class="bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded">${modeNames[detail.type].split('➔')[0] || '聽力'}</span>
+                                <span class="font-bold text-slate-800">${detail.wordObj.word} (${detail.wordObj.kana})</span>
+                            </div>
+                            <div class="text-sm text-slate-500 mb-2">正確意思：${detail.wordObj.zh}</div>
+                            
+                            <div class="bg-white p-2 rounded-lg border border-slate-100">
+                                ${userAnsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                historyDetailList.appendChild(card);
+            });
+        }
+
+        function showLatestHistoryDetail() {
+            showHistoryDetail(0);
+        }
+
+        function hideAllScreens() {
+            const screens = [
+                startScreen, headerInfo, quizContainer, 
+                feedbackBox, endScreen, historyScreen, historyDetailScreen
+            ];
+            
+            screens.forEach(screen => {
+                if(screen) {
+                    screen.classList.add('hidden');
+                    screen.classList.remove('flex');
+                }
+            });
+        }
+
+        function backToMenu() {
+            hideAllScreens();
+            startScreen.classList.remove('hidden');
+            startScreen.classList.add('flex');
+            
+            // 每次回選單順便更新一下連動狀態
+            updateLessonDropdown();
+        }
+
+        function backToMenuFromHistory() {
+            backToMenu();
+        }
+
+        function backToHistoryList() {
+            hideAllScreens();
+            showHistoryList(); 
+        }
+
+        function restartSameMode() {
+            startGame(selectedMode);
+        }
+
+        function quitQuiz() {
+            window.speechSynthesis.cancel(); 
+            backToMenu();
+        }
+
+        // 初始化時觸發一次下拉選單邏輯，確保畫面正確
+        window.addEventListener('DOMContentLoaded', updateLessonDropdown);
+
+    </script>
+</body>
+</html>
