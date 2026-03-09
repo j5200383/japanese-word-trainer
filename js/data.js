@@ -104,14 +104,74 @@ export const wordList = [
     { word: "それに", kana: "それに", zh: "並且", level: "N4", lesson: "2" },
     { word: "ところが", kana: "ところが", zh: "然而, 可是, 不過", level: "N4", lesson: "2" },
     { word: "それで", kana: "それで", zh: "於是, 所以", level: "N4", lesson: "2" },
-    { word: "フェスティバル", kana: "フェスティバル", zh: "節日, 慶典", level: "N4", lesson: "2" }
+    { word: "フェスティバル", kana: "フェスティバル", zh: "節日, 慶典", level: "N4", lesson: "2" },
+    
+    // N4 單字 (第三課)
+    { word: "けっこんしき", kana: "けっこんしき", zh: "婚禮", level: "N4", lesson: "3" },
+    { word: "ごほうめい", kana: "ごほうめい", zh: "芳名", level: "N4", lesson: "3" },
+    { word: "意味", kana: "いみ", zh: "意思", level: "N4", lesson: "3" },
+    { word: "しょうたいする", kana: "しょうたいする", zh: "招待", level: "N4", lesson: "3" },
+    { word: "しょうたいじょう", kana: "しょうたいじょう", zh: "邀請函，邀請信", level: "N4", lesson: "3" },
+    { word: "ふつう", kana: "ふつう", zh: "普通，一般，平常", level: "N4", lesson: "3" },
+    { word: "そんなに", kana: "そんなに", zh: "那麼，那麼樣", level: "N4", lesson: "3" },
+    { word: "席", kana: "せき", zh: "位子，座位", level: "N4", lesson: "3" },
+    { word: "決める", kana: "きめる", zh: "決定", level: "N4", lesson: "3" },
+    { word: "礼状", kana: "れいじょう", zh: "感謝信", level: "N4", lesson: "3" },
+    { word: "お礼", kana: "おれい", zh: "致謝，謝意；回禮，回敬", level: "N4", lesson: "3" },
+    { word: "くもり", kana: "くもり", zh: "陰天", level: "N4", lesson: "3" },
+    { word: "はれる", kana: "はれる", zh: "晴朗", level: "N4", lesson: "3" },
+    { word: "さんかく(△)", kana: "さんかく", zh: "三角形", level: "N4", lesson: "3" },
+    { word: "不在", kana: "ふざい", zh: "不在（家）", level: "N4", lesson: "3" },
+    { word: "頼む", kana: "たのむ", zh: "拜託，請求，委託", level: "N4", lesson: "3" },
+    { word: "さそう", kana: "さそう", zh: "邀請", level: "N4", lesson: "3" },
+    { word: "ほめる", kana: "ほめる", zh: "表揚，稱讚", level: "N4", lesson: "3" },
+    { word: "助ける", kana: "たすける", zh: "幫助，援助，協助，救助", level: "N4", lesson: "3" },
+    { word: "連れてくる", kana: "つれてくる", zh: "帶領（人）來", level: "N4", lesson: "3" },
+    { word: "しょうかいする", kana: "しょうかいする", zh: "介紹", level: "N4", lesson: "3" },
+    { word: "社長", kana: "しゃちょう", zh: "社長，董事長", level: "N4", lesson: "3" },
+    { word: "起こす", kana: "おこす", zh: "叫醒，喚醒", level: "N4", lesson: "3" },
+    { word: "かぜ", kana: "かぜ", zh: "感冒，傷風", level: "N4", lesson: "3" },
+    { word: "かぜをひく", kana: "かぜをひく", zh: "著涼，感冒", level: "N4", lesson: "3" },
+    { word: "なかなか", kana: "なかなか", zh: "非常，相當", level: "N4", lesson: "3" },
+    { word: "〜キロ", kana: "キロ", zh: "～公里；～公斤", level: "N4", lesson: "3" },
+    { word: "これから", kana: "これから", zh: "從現在起，從今往後", level: "N4", lesson: "3" },
+    { word: "かならず", kana: "かならず", zh: "必須，一定", level: "N4", lesson: "3" },
+    { word: "じゅんび", kana: "じゅんび", zh: "準備", level: "N4", lesson: "3" },
+    { word: "留学する", kana: "りゅうがくする", zh: "留學", level: "N4", lesson: "3" },
+    { word: "ビザ", kana: "ビザ", zh: "簽證", level: "N4", lesson: "3" },
+    { word: "歯医者", kana: "はいしゃ", zh: "牙醫", level: "N4", lesson: "3" },
+    { word: "出席する", kana: "しゅっせきする", zh: "出席", level: "N4", lesson: "3" },
+    { word: "参加する", kana: "さんかする", zh: "參加", level: "N4", lesson: "3" },
+    { word: "おいわい", kana: "おいわい", zh: "慶祝", level: "N4", lesson: "3" },
+    { word: "たばこ", kana: "たばこ", zh: "菸草，香菸", level: "N4", lesson: "3" },
+    { word: "空気", kana: "くうき", zh: "空氣", level: "N4", lesson: "3" },
+    { word: "止める", kana: "とめる", zh: "停（車）", level: "N4", lesson: "3" },
+    { word: "座る", kana: "すわる", zh: "坐", level: "N4", lesson: "3" },
+    { word: "えさ", kana: "えさ", zh: "飼料，餌食", level: "N4", lesson: "3" },
+    { word: "さしあげる", kana: "さしあげる", zh: "給予（「あげる」的謙讓語）", level: "N4", lesson: "3" },
+    { word: "カタログ", kana: "カタログ", zh: "商品目錄", level: "N4", lesson: "3" },
+    { word: "エアコン", kana: "エアコン", zh: "空調，冷氣", level: "N4", lesson: "3" },
+    { word: "プリント", kana: "プリント", zh: "列印出來的文件，印刷物", level: "N4", lesson: "3" },
+    { word: "下がる", kana: "さがる", zh: "下降，降落；降低，衰退", level: "N4", lesson: "3" },
+    { word: "意見", kana: "いけん", zh: "意見，建議", level: "N4", lesson: "3" },
+    { word: "ごみばこ", kana: "ごみばこ", zh: "垃圾桶", level: "N4", lesson: "3" },
+    { word: "少ない", kana: "すくない", zh: "少", level: "N4", lesson: "3" },
+    { word: "ふやす", kana: "ふやす", zh: "增加，添加", level: "N4", lesson: "3" },
+    { word: "考える", kana: "かんがえる", zh: "思考", level: "N4", lesson: "3" },
+    { word: "ねむい", kana: "ねむい", zh: "睏，困倦，想睡覺", level: "N4", lesson: "3" },
+    { word: "前の日", kana: "まえのひ", zh: "前一天", level: "N4", lesson: "3" },
+    { word: "そうだんする", kana: "そうだんする", zh: "諮詢；商量", level: "N4", lesson: "3" },
+    { word: "最近", kana: "さいきん", zh: "最近", level: "N4", lesson: "3" },
+    { word: "卒業する", kana: "そつぎょうする", zh: "畢業", level: "N4", lesson: "3" },
+    { word: "大学院", kana: "だいがくいん", zh: "大學研究所", level: "N4", lesson: "3" }
 ];
 
 // 課程資料設定
 export const lessonData = {
     "N4": [
         { value: "all", label: "全部 N4 單字" },
-        { value: "2", label: "第二課" }
+        { value: "2", label: "第二課" },
+        { value: "3", label: "第三課" }
     ]
 };
 
