@@ -64,6 +64,31 @@ function setupEventListeners() {
     const backListFromDetail = document.querySelector('button[onclick="backToHistoryList()"]');
     if(backListFromDetail) backListFromDetail.onclick = handleShowHistoryList;
 
+    // 單字庫按鈕與篩選器
+    const browseVocabBtn = ui.els.btnBrowseVocab();
+    if(browseVocabBtn) browseVocabBtn.onclick = handleShowVocabList;
+
+    const backFromVocabBtn = ui.els.btnBackFromVocab();
+    if(backFromVocabBtn) backFromVocabBtn.onclick = backToMenu;
+
+    const vocabLevelSelect = ui.els.vocabLevelSelect();
+    if(vocabLevelSelect) vocabLevelSelect.addEventListener('change', handleVocabLevelChange);
+
+    const vocabLessonSelect = ui.els.vocabLessonSelect();
+    if(vocabLessonSelect) vocabLessonSelect.addEventListener('change', handleVocabLessonChange);
+
+    // 單字庫內的發音按鈕 (事件委任)
+    const vocabListEl = ui.els.vocabList();
+    if(vocabListEl) {
+        vocabListEl.addEventListener('click', (e) => {
+            const btn = e.target.closest('.btn-play-vocab');
+            if(btn) {
+                const word = btn.getAttribute('data-word');
+                if(word) audioService.playAudio(word);
+            }
+        });
+    }
+
     // 結束畫面按鈕
     const reviewBtn = document.querySelector('button[onclick="showLatestHistoryDetail()"]');
     if(reviewBtn) reviewBtn.onclick = () => {
@@ -225,6 +250,32 @@ function handleShowHistoryList() {
 
 function handleShowHistoryDetail(record) {
     ui.renderHistoryDetail(record);
+}
+
+// ---- 單字庫邏輯 ----
+function handleShowVocabList() {
+    ui.hideAllScreens();
+    ui.showScreen(ui.els.vocabScreen());
+    
+    // 初始化單字庫的下拉選單並渲染
+    handleVocabLevelChange();
+}
+
+function handleVocabLevelChange() {
+    const level = ui.els.vocabLevelSelect().value;
+    ui.updateVocabLessonDropdown(lessonData[level]);
+    updateVocabList();
+}
+
+function handleVocabLessonChange() {
+    updateVocabList();
+}
+
+function updateVocabList() {
+    const level = ui.els.vocabLevelSelect().value;
+    const lesson = ui.els.vocabLessonSelect().value;
+    const filteredWords = quizService.getFilteredWords(level, lesson);
+    ui.renderVocabList(filteredWords);
 }
 
 function backToMenu() {

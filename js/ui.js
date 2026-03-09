@@ -37,6 +37,15 @@ export const els = {
     finalScore: () => document.getElementById('final-score'),
     detailScoreBadge: () => document.getElementById('detail-score-badge'),
 
+    // --- Vocab List Elements ---
+    vocabScreen: () => document.getElementById('vocab-screen'),
+    vocabList: () => document.getElementById('vocab-list'),
+    vocabLevelSelect: () => document.getElementById('vocab-level'),
+    vocabLessonContainer: () => document.getElementById('vocab-lesson-container'),
+    vocabLessonSelect: () => document.getElementById('vocab-lesson'),
+    btnBrowseVocab: () => document.getElementById('btn-browse-vocab'),
+    btnBackFromVocab: () => document.getElementById('btn-back-from-vocab'),
+
     // --- Flashcard Elements ---
     flashcardContainer: () => document.getElementById('flashcard-container'),
     flashcardBox: () => document.getElementById('flashcard-box'),
@@ -58,7 +67,7 @@ export function hideAllScreens() {
     const screens = [
         els.startScreen(), els.headerInfo(), els.quizContainer(), 
         els.feedbackBox(), els.endScreen(), els.historyScreen(), els.historyDetailScreen(),
-        els.flashcardContainer()
+        els.flashcardContainer(), els.vocabScreen()
     ];
     screens.forEach(s => {
         if(s) {
@@ -78,6 +87,25 @@ export function showScreen(screenEl, displayStyle = 'flex') {
 export function updateLessonDropdown(lessonDataList) {
     const lessonContainerEl = els.lessonContainer();
     const lessonSelectEl = els.lessonSelect();
+    
+    if (lessonDataList && lessonDataList.length > 0) {
+        lessonContainerEl.classList.remove('hidden');
+        lessonSelectEl.innerHTML = '';
+        lessonDataList.forEach(lesson => {
+            const option = document.createElement('option');
+            option.value = lesson.value;
+            option.textContent = lesson.label;
+            lessonSelectEl.appendChild(option);
+        });
+    } else {
+        lessonContainerEl.classList.add('hidden');
+        lessonSelectEl.innerHTML = '<option value="all">全部</option>';
+    }
+}
+
+export function updateVocabLessonDropdown(lessonDataList) {
+    const lessonContainerEl = els.vocabLessonContainer();
+    const lessonSelectEl = els.vocabLessonSelect();
     
     if (lessonDataList && lessonDataList.length > 0) {
         lessonContainerEl.classList.remove('hidden');
@@ -319,5 +347,50 @@ export function renderHistoryDetail(record) {
             </div>
         `;
         historyDetailListEl.appendChild(card);
+    });
+}
+
+export function renderVocabList(words) {
+    const listEl = els.vocabList();
+    listEl.innerHTML = '';
+
+    if (words.length === 0) {
+        listEl.innerHTML = `<div class="text-center text-slate-400 py-10">此範圍目前沒有單字</div>`;
+        return;
+    }
+
+    words.forEach((wordObj, index) => {
+        const item = document.createElement('div');
+        item.className = "bg-white border-2 border-slate-100 p-4 rounded-xl flex items-center justify-between hover:border-indigo-300 transition shadow-sm relative min-h-[100px]";
+        
+        let levelBadge = '';
+        const levelText = wordObj.level ? `${wordObj.level} 第${wordObj.lesson || '?'}課` : '未分類';
+        levelBadge = `<span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold mb-2 inline-block">${levelText}</span>`;
+
+        // 判斷是否需要顯示 Ruby (漢字上方平假名)
+        let wordHtml = '';
+        if (wordObj.word !== wordObj.kana) {
+            wordHtml = `<ruby class="text-2xl font-bold text-slate-800">${wordObj.word}<rt class="text-xs text-indigo-500 font-bold mb-1">${wordObj.kana}</rt></ruby>`;
+        } else {
+            wordHtml = `<span class="text-2xl font-bold text-slate-800">${wordObj.word}</span>`;
+        }
+
+        item.innerHTML = `
+            <div class="flex-grow pr-4">
+                <div class="mb-1">
+                    ${wordHtml}
+                </div>
+                <div class="text-slate-600 text-sm mt-2">${wordObj.zh}</div>
+            </div>
+            <div class="flex flex-col items-end shrink-0">
+                ${levelBadge}
+                <button class="btn-play-vocab bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-3 rounded-full transition shadow-sm border border-indigo-100 mt-1" data-word="${wordObj.word}" title="播放發音">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z" />
+                    </svg>
+                </button>
+            </div>
+        `;
+        listEl.appendChild(item);
     });
 }
