@@ -119,5 +119,6 @@ export const modeNames = {
     'zh-to-jp': '🇹🇼 看中文 ➔ 打日文',
     'jp-to-zh': '🇯🇵 看日文 ➔ 打中文',
     'audio': '🎧 聽發音',
-    'mixed': '🔀 綜合混合練習'
+    'mixed': '🔀 綜合混合練習',
+    'flashcard': '📇 閃卡記憶模式'
 };

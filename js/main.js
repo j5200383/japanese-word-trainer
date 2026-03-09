@@ -29,6 +29,27 @@ function setupEventListeners() {
     ui.els.submitBtn().onclick = handleSubmitAnswer;
     ui.els.nextBtn().onclick = loadNextQuestion;
 
+    // 閃卡模式按鈕
+    const fcBox = ui.els.flashcardBox();
+    if(fcBox) fcBox.onclick = handleFlipFlashcard;
+    const btnFlip = ui.els.btnFcFlip();
+    if(btnFlip) btnFlip.onclick = handleFlipFlashcard;
+    const btnForgot = ui.els.btnFcForgot();
+    if(btnForgot) btnForgot.onclick = () => handleFlashcardResult(false);
+    const btnRemembered = ui.els.btnFcRemembered();
+    if(btnRemembered) btnRemembered.onclick = () => handleFlashcardResult(true);
+
+    const checkAudioHit = (e) => {
+        e.stopPropagation();
+        const qData = quizService.getCurrentQuestion();
+        if(qData) audioService.playAudio(qData.word.word);
+    };
+    
+    const fcPlayFront = ui.els.fcPlayFront();
+    if (fcPlayFront) fcPlayFront.onclick = checkAudioHit;
+    const fcPlayBack = ui.els.fcPlayBack();
+    if (fcPlayBack) fcPlayBack.onclick = checkAudioHit;
+
     // 歷史紀錄按鈕
     const viewHistoryBtn = ui.els.startScreen().querySelector('button[onclick="showHistoryList()"]');
     if(viewHistoryBtn) viewHistoryBtn.onclick = handleShowHistoryList;
@@ -91,9 +112,48 @@ function startGame(mode) {
     ui.els.score().textContent = `得分: 0`;
     ui.hideAllScreens();
     ui.showScreen(ui.els.headerInfo());
-    ui.showScreen(ui.els.quizContainer());
 
-    loadQuestion();
+    if (mode === 'flashcard') {
+        ui.showScreen(ui.els.flashcardContainer());
+        isFlashcardFlipped = false;
+        loadFlashcard();
+    } else {
+        ui.showScreen(ui.els.quizContainer());
+        loadQuestion();
+    }
+}
+
+let isFlashcardFlipped = false;
+
+function loadFlashcard() {
+    const qData = quizService.getCurrentQuestion();
+    if (!qData) {
+        handleEndGame();
+        return;
+    }
+    
+    ui.els.progress().textContent = `進度: ${qData.index + 1} / ${qData.total}`;
+    isFlashcardFlipped = false;
+    ui.renderFlashcard(qData.word, isFlashcardFlipped);
+    
+    // 自動唸字
+    audioService.playAudio(qData.word.word);
+}
+
+function handleFlipFlashcard() {
+    if (isFlashcardFlipped) return; // 已翻開就不再翻
+    isFlashcardFlipped = true;
+    const qData = quizService.getCurrentQuestion();
+    ui.renderFlashcard(qData.word, isFlashcardFlipped);
+    
+    // 翻開後發音
+    audioService.playAudio(qData.word.word);
+}
+
+function handleFlashcardResult(knewIt) {
+    quizService.handleFlashcardAnswer(knewIt);
+    quizService.moveToNextQuestion();
+    loadFlashcard();
 }
 
 function loadQuestion() {
@@ -174,7 +234,20 @@ function handleKeydown(event) {
 
     if (event.key === 'Enter') {
         const quizContainer = ui.els.quizContainer();
+        const fcContainer = ui.els.flashcardContainer();
         const feedbackBox = ui.els.feedbackBox();
+
+        // 閃卡模式下的處理
+        if (fcContainer && !fcContainer.classList.contains('hidden')) {
+            event.preventDefault();
+            if (!isFlashcardFlipped) {
+                handleFlipFlashcard();
+            } else {
+                handleFlashcardResult(true); // 預設 Enter 代表「記得」
+            }
+            return;
+        }
+
         const qData = quizService.getCurrentQuestion(); // 用來判斷目前是在測驗中
 
         if (!quizContainer.classList.contains('hidden') && feedbackBox.classList.contains('hidden')) {

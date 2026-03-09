@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日文單字打字練習</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+    </style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans flex flex-col items-center justify-center p-4">
 
@@ -71,7 +77,12 @@
 
         <!-- 🌟 模式選擇按鈕 (優化版：徹底修復窄螢幕文字跑版問題) -->
         <div class="w-full space-y-3 mb-6 shrink-0">
-            <button onclick="startGame('zh-to-jp')" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border-2 border-blue-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between">
+            <button onclick="startGame('flashcard')" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 border-2 border-rose-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between">
+                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">📇</span>
+                <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">閃卡記憶模式</span>
+                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🔄</span>
+            </button>
+            <button onclick="startGame('zh-to-jp')" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border-2 border-blue-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between mt-2">
                 <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🇹🇼</span>
                 <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">看中文 ➔ 打日文</span>
                 <span class="text-lg sm:text-xl shrink-0 w-8 text-center">📝</span>
@@ -135,6 +146,64 @@
                 </div>
                 <button onclick="nextQuestion()" id="next-btn" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-900 transition shadow-md">
                     下一題
+                </button>
+            </div>
+        </div>
+
+        <!-- 閃卡模式區塊 -->
+        <div id="flashcard-container" class="hidden flex-col items-center w-full flex-grow pb-4 px-1 overflow-y-auto">
+            <span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-xs font-bold mb-4 shrink-0 mt-2">
+                📇 模式：閃卡記憶
+            </span>
+            
+            <!-- 3D 翻轉卡片容器 -->
+            <div class="relative w-full h-64 perspective-1000 cursor-pointer mb-8 shrink-0 mt-4 group" id="flashcard-box">
+                <div id="flashcard-inner" class="w-full h-full absolute top-0 left-0 transform-style-3d shadow-lg rounded-2xl">
+                    <!-- 正面 -->
+                    <div class="absolute w-full h-full backface-hidden bg-white border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-center p-6 text-center group/card">
+                        <!-- 發音播放鈕 (正面) -->
+                        <button id="fc-play-front" class="absolute top-4 right-4 text-slate-400 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 p-2 rounded-full transition shadow-sm z-10" title="播放發音">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z" />
+                            </svg>
+                        </button>
+                        
+                        <p class="text-slate-400 text-sm mb-2">日文單字</p>
+                        <h2 id="fc-front-word" class="text-5xl font-bold text-slate-800"></h2>
+                        <p class="text-slate-400 text-xs mt-auto">點擊卡片翻面</p>
+                    </div>
+                    <!-- 背面 -->
+                    <div class="absolute w-full h-full backface-hidden bg-white border-2 border-rose-200 rounded-2xl flex flex-col items-center justify-center p-6 text-center rotate-y-180">
+                        <!-- 發音播放鈕 (背面) -->
+                        <button id="fc-play-back" class="absolute top-4 right-4 text-slate-400 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 p-2 rounded-full transition shadow-sm z-10" title="播放發音">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z" />
+                            </svg>
+                        </button>
+                        
+                        <h2 id="fc-back-word" class="text-3xl font-bold text-slate-800 mb-2"></h2>
+                        <p id="fc-back-kana" class="text-xl text-indigo-600 font-bold mb-4"></p>
+                        <hr class="w-full border-slate-200 mb-4">
+                        <p id="fc-back-zh" class="text-2xl text-slate-700 font-bold"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 閃卡按鈕區塊 -->
+            <div id="fc-controls-front" class="w-full mt-auto">
+                <button id="btn-fc-flip" class="w-full bg-slate-800 text-white py-4 rounded-xl font-bold hover:bg-slate-900 transition flex items-center justify-center gap-2 shadow-md">
+                    🔄 翻開看答案
+                </button>
+            </div>
+            
+            <div id="fc-controls-back" class="hidden w-full mt-auto gap-3 flex shrink-0 pb-2">
+                <button id="btn-fc-forgot" class="flex-1 bg-rose-100 hover:bg-rose-200 text-rose-700 py-4 rounded-xl font-bold transition flex flex-col items-center justify-center shadow-sm border-2 border-rose-200">
+                    <span class="text-xl mb-1">❌</span>
+                    <span>不熟 (重測)</span>
+                </button>
+                <button id="btn-fc-remembered" class="flex-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 py-4 rounded-xl font-bold transition flex flex-col items-center justify-center shadow-sm border-2 border-emerald-200">
+                    <span class="text-xl mb-1">✅</span>
+                    <span>記得 (下一個)</span>
                 </button>
             </div>
         </div>

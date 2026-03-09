@@ -34,13 +34,30 @@ export const els = {
     ansZh: () => document.getElementById('ans-zh'),
     feedbackTitle: () => document.getElementById('feedback-title'),
     finalScore: () => document.getElementById('final-score'),
-    detailScoreBadge: () => document.getElementById('detail-score-badge')
+    detailScoreBadge: () => document.getElementById('detail-score-badge'),
+
+    // --- Flashcard Elements ---
+    flashcardContainer: () => document.getElementById('flashcard-container'),
+    flashcardBox: () => document.getElementById('flashcard-box'),
+    flashcardInner: () => document.getElementById('flashcard-inner'),
+    fcFrontWord: () => document.getElementById('fc-front-word'),
+    fcBackWord: () => document.getElementById('fc-back-word'),
+    fcBackKana: () => document.getElementById('fc-back-kana'),
+    fcBackZh: () => document.getElementById('fc-back-zh'),
+    fcControlsFront: () => document.getElementById('fc-controls-front'),
+    fcControlsBack: () => document.getElementById('fc-controls-back'),
+    btnFcFlip: () => document.getElementById('btn-fc-flip'),
+    btnFcForgot: () => document.getElementById('btn-fc-forgot'),
+    btnFcRemembered: () => document.getElementById('btn-fc-remembered'),
+    fcPlayFront: () => document.getElementById('fc-play-front'),
+    fcPlayBack: () => document.getElementById('fc-play-back')
 };
 
 export function hideAllScreens() {
     const screens = [
         els.startScreen(), els.headerInfo(), els.quizContainer(), 
-        els.feedbackBox(), els.endScreen(), els.historyScreen(), els.historyDetailScreen()
+        els.feedbackBox(), els.endScreen(), els.historyScreen(), els.historyDetailScreen(),
+        els.flashcardContainer()
     ];
     screens.forEach(s => {
         if(s) {
@@ -153,6 +170,33 @@ export function renderQuestion(wordObj, type) {
         `;
         jpInputContainer.classList.remove('hidden');
         zhInputContainer.classList.remove('hidden');
+    }
+}
+
+export function renderFlashcard(wordObj, isFlipped) {
+    els.fcFrontWord().textContent = wordObj.word;
+    els.fcBackWord().textContent = wordObj.word;
+    els.fcBackKana().textContent = wordObj.kana;
+    els.fcBackZh().textContent = wordObj.zh;
+
+    const inner = els.flashcardInner();
+    const ctrlFront = els.fcControlsFront();
+    const ctrlBack = els.fcControlsBack();
+
+    if (isFlipped) {
+        inner.classList.add('rotate-y-180');
+        ctrlFront.classList.add('hidden');
+        ctrlBack.classList.remove('hidden');
+    } else {
+        if (inner.classList.contains('rotate-y-180')) {
+            inner.style.transition = 'none';
+            inner.classList.remove('rotate-y-180');
+            // Force reflow allowing exact rendering frame without transition
+            void inner.offsetWidth;
+            inner.style.transition = '';
+        }
+        ctrlFront.classList.remove('hidden');
+        ctrlBack.classList.add('hidden');
     }
 }
 

@@ -99,6 +99,31 @@ export function checkAnswer(userJp, userZh) {
     };
 }
 
+export function handleFlashcardAnswer(knewIt) {
+    const currentWord = currentQuizList[currentIndex];
+    
+    if (knewIt) {
+        score += 10;
+        currentSessionDetails.push({
+            wordObj: currentWord,
+            type: 'flashcard',
+            userJp: '(記得)',
+            userZh: '(記得)',
+            isCorrect: true
+        });
+    } else {
+        // 如果不熟，塞回陣列尾端，之後會再測到
+        currentQuizList.push(currentWord);
+        currentSessionDetails.push({
+            wordObj: currentWord,
+            type: 'flashcard',
+            userJp: '(不熟)',
+            userZh: '(不熟)',
+            isCorrect: false
+        });
+    }
+}
+
 export function moveToNextQuestion() {
     currentIndex++;
 }
