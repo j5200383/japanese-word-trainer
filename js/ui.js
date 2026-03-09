@@ -17,6 +17,7 @@ export const els = {
     endScreen: () => document.getElementById('end-screen'),
     historyScreen: () => document.getElementById('history-screen'),
     historyList: () => document.getElementById('history-list'),
+    historyFilterSelect: () => document.getElementById('history-filter'),
     historyDetailScreen: () => document.getElementById('history-detail-screen'),
     historyDetailList: () => document.getElementById('history-detail-list'),
     progress: () => document.getElementById('progress'),
@@ -252,7 +253,7 @@ export function renderHistoryList(history, showHistoryDetailCallback) {
     history.forEach((record, index) => {
         const item = document.createElement('div');
         item.className = "bg-white border-2 border-slate-100 p-4 rounded-xl flex items-center justify-between cursor-pointer hover:border-indigo-300 hover:shadow-md transition";
-        item.addEventListener('click', () => showHistoryDetailCallback(index));
+        item.addEventListener('click', () => showHistoryDetailCallback(record));
         
         item.innerHTML = `
             <div>
@@ -286,7 +287,7 @@ export function renderHistoryDetail(record) {
             userAnsHtml = `<p class="text-sm text-slate-600">你的輸入：<span class="font-bold ${isCorr ? 'text-emerald-700' : 'text-rose-600'}">${detail.userJp || '(未填寫)'}</span></p>`;
         } else if (detail.type === 'jp-to-zh') {
             userAnsHtml = `<p class="text-sm text-slate-600">你的輸入：<span class="font-bold ${isCorr ? 'text-emerald-700' : 'text-rose-600'}">${detail.userZh || '(未填寫)'}</span></p>`;
-        } else {
+        } else if (detail.type !== 'flashcard') {
             userAnsHtml = `
                 <p class="text-sm text-slate-600">日文輸入：<span class="font-bold ${detail.userJp ? (isCorr ? 'text-emerald-700' : 'text-rose-600') : 'text-rose-600'}">${detail.userJp || '(未填寫)'}</span></p>
                 <p class="text-sm text-slate-600">中文輸入：<span class="font-bold ${detail.userZh ? (isCorr ? 'text-emerald-700' : 'text-rose-600') : 'text-rose-600'}">${detail.userZh || '(未填寫)'}</span></p>
@@ -294,6 +295,15 @@ export function renderHistoryDetail(record) {
         }
 
         const modeBadgeLabel = modeNames[detail.type] ? modeNames[detail.type].split('➔')[0] : '聽力';
+        
+        let userInputBoxHtml = '';
+        if (detail.type !== 'flashcard') {
+            userInputBoxHtml = `
+                    <div class="bg-white p-2 rounded-lg border border-slate-100 mt-2">
+                        ${userAnsHtml}
+                    </div>
+            `;
+        }
 
         card.innerHTML = `
             <div class="flex items-start gap-3">
@@ -304,10 +314,7 @@ export function renderHistoryDetail(record) {
                         <span class="font-bold text-slate-800">${detail.wordObj.word} (${detail.wordObj.kana})</span>
                     </div>
                     <div class="text-sm text-slate-500 mb-2">正確意思：${detail.wordObj.zh}</div>
-                    
-                    <div class="bg-white p-2 rounded-lg border border-slate-100">
-                        ${userAnsHtml}
-                    </div>
+                    ${userInputBoxHtml}
                 </div>
             </div>
         `;

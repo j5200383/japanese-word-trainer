@@ -234,6 +234,18 @@
                 </button>
                 <h2 class="text-xl font-bold text-slate-800 ml-2">歷史成績</h2>
             </div>
+            
+            <div class="mb-4 shrink-0">
+                <select id="history-filter" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2 focus:border-indigo-500 focus:outline-none transition text-slate-700 bg-slate-50">
+                    <option value="all">顯示所有模式</option>
+                    <option value="flashcard">📇 閃卡記憶模式</option>
+                    <option value="zh-to-jp">🇹🇼 看中文 ➔ 打日文</option>
+                    <option value="jp-to-zh">🇯🇵 看日文 ➔ 打中文</option>
+                    <option value="audio">🎧 聽發音</option>
+                    <option value="mixed">🔀 綜合混合練習</option>
+                </select>
+            </div>
+            
             <div id="history-list" class="w-full flex-grow overflow-y-auto space-y-3 pb-4 pr-1"></div>
         </div>
 

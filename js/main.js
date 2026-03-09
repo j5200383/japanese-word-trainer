@@ -53,6 +53,10 @@ function setupEventListeners() {
     // 歷史紀錄按鈕
     const viewHistoryBtn = ui.els.startScreen().querySelector('button[onclick="showHistoryList()"]');
     if(viewHistoryBtn) viewHistoryBtn.onclick = handleShowHistoryList;
+    
+    // 初始化 filter 監聽器
+    const historyFilter = ui.els.historyFilterSelect();
+    if (historyFilter) historyFilter.addEventListener('change', handleShowHistoryList);
 
     const backMenuFromHistory = document.querySelector('button[onclick="backToMenuFromHistory()"]');
     if(backMenuFromHistory) backMenuFromHistory.onclick = backToMenu;
@@ -62,7 +66,10 @@ function setupEventListeners() {
 
     // 結束畫面按鈕
     const reviewBtn = document.querySelector('button[onclick="showLatestHistoryDetail()"]');
-    if(reviewBtn) reviewBtn.onclick = () => handleShowHistoryDetail(0);
+    if(reviewBtn) reviewBtn.onclick = () => {
+        const history = storageService.getHistory();
+        if(history.length > 0) handleShowHistoryDetail(history[0]);
+    };
 
     const restartBtn = document.querySelector('button[onclick="restartSameMode()"]');
     if(restartBtn) restartBtn.onclick = () => startGame(quizService.getGameResults().mode);
@@ -208,12 +215,16 @@ function handleEndGame() {
 }
 
 function handleShowHistoryList() {
-    ui.renderHistoryList(storageService.getHistory(), handleShowHistoryDetail);
+    let history = storageService.getHistory();
+    const filterSelect = ui.els.historyFilterSelect();
+    if (filterSelect && filterSelect.value !== 'all') {
+        history = history.filter(record => record.mode === filterSelect.value);
+    }
+    ui.renderHistoryList(history, handleShowHistoryDetail);
 }
 
-function handleShowHistoryDetail(index) {
-    const history = storageService.getHistory();
-    ui.renderHistoryDetail(history[index]);
+function handleShowHistoryDetail(record) {
+    ui.renderHistoryDetail(record);
 }
 
 function backToMenu() {
