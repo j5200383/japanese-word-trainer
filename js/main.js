@@ -16,8 +16,8 @@ function setupEventListeners() {
 
     // 遊戲重置/退出
     const quitBtn = document.querySelector('button[onclick="quitQuiz()"]');
-    if(quitBtn) quitBtn.onclick = quitQuiz;
-    
+    if (quitBtn) quitBtn.onclick = quitQuiz;
+
     // 綁定首頁模式按鈕 (取代 HTML 上的 onclick='startGame(...)')
     const modeBtns = ui.els.startScreen().querySelectorAll('button[onclick^="startGame"]');
     modeBtns.forEach(btn => {
@@ -31,20 +31,20 @@ function setupEventListeners() {
 
     // 閃卡模式按鈕
     const fcBox = ui.els.flashcardBox();
-    if(fcBox) fcBox.onclick = handleFlipFlashcard;
+    if (fcBox) fcBox.onclick = handleFlipFlashcard;
     const btnFlip = ui.els.btnFcFlip();
-    if(btnFlip) btnFlip.onclick = handleFlipFlashcard;
+    if (btnFlip) btnFlip.onclick = handleFlipFlashcard;
     const btnForgot = ui.els.btnFcForgot();
-    if(btnForgot) btnForgot.onclick = () => handleFlashcardResult(false);
+    if (btnForgot) btnForgot.onclick = () => handleFlashcardResult(false);
     const btnRemembered = ui.els.btnFcRemembered();
-    if(btnRemembered) btnRemembered.onclick = () => handleFlashcardResult(true);
+    if (btnRemembered) btnRemembered.onclick = () => handleFlashcardResult(true);
 
     const checkAudioHit = (e) => {
         e.stopPropagation();
         const qData = quizService.getCurrentQuestion();
-        if(qData) audioService.playAudio(qData.word.word);
+        if (qData) audioService.playAudio(qData.word.word);
     };
-    
+
     const fcPlayFront = ui.els.fcPlayFront();
     if (fcPlayFront) fcPlayFront.onclick = checkAudioHit;
     const fcPlayBack = ui.els.fcPlayBack();
@@ -52,55 +52,55 @@ function setupEventListeners() {
 
     // 歷史紀錄按鈕
     const viewHistoryBtn = ui.els.startScreen().querySelector('button[onclick="showHistoryList()"]');
-    if(viewHistoryBtn) viewHistoryBtn.onclick = handleShowHistoryList;
-    
+    if (viewHistoryBtn) viewHistoryBtn.onclick = handleShowHistoryList;
+
     // 初始化 filter 監聽器
     const historyFilter = ui.els.historyFilterSelect();
     if (historyFilter) historyFilter.addEventListener('change', handleShowHistoryList);
 
     const backMenuFromHistory = document.querySelector('button[onclick="backToMenuFromHistory()"]');
-    if(backMenuFromHistory) backMenuFromHistory.onclick = backToMenu;
+    if (backMenuFromHistory) backMenuFromHistory.onclick = backToMenu;
 
     const backListFromDetail = document.querySelector('button[onclick="backToHistoryList()"]');
-    if(backListFromDetail) backListFromDetail.onclick = handleShowHistoryList;
+    if (backListFromDetail) backListFromDetail.onclick = handleShowHistoryList;
 
     // 單字庫按鈕與篩選器
     const browseVocabBtn = ui.els.btnBrowseVocab();
-    if(browseVocabBtn) browseVocabBtn.onclick = handleShowVocabList;
+    if (browseVocabBtn) browseVocabBtn.onclick = handleShowVocabList;
 
     const backFromVocabBtn = ui.els.btnBackFromVocab();
-    if(backFromVocabBtn) backFromVocabBtn.onclick = backToMenu;
+    if (backFromVocabBtn) backFromVocabBtn.onclick = backToMenu;
 
     const vocabLevelSelect = ui.els.vocabLevelSelect();
-    if(vocabLevelSelect) vocabLevelSelect.addEventListener('change', handleVocabLevelChange);
+    if (vocabLevelSelect) vocabLevelSelect.addEventListener('change', handleVocabLevelChange);
 
     const vocabLessonSelect = ui.els.vocabLessonSelect();
-    if(vocabLessonSelect) vocabLessonSelect.addEventListener('change', handleVocabLessonChange);
+    if (vocabLessonSelect) vocabLessonSelect.addEventListener('change', handleVocabLessonChange);
 
     // 單字庫內的發音按鈕 (事件委任)
     const vocabListEl = ui.els.vocabList();
-    if(vocabListEl) {
+    if (vocabListEl) {
         vocabListEl.addEventListener('click', (e) => {
             const btn = e.target.closest('.btn-play-vocab');
-            if(btn) {
+            if (btn) {
                 const word = btn.getAttribute('data-word');
-                if(word) audioService.playAudio(word);
+                if (word) audioService.playAudio(word);
             }
         });
     }
 
     // 結束畫面按鈕
     const reviewBtn = document.querySelector('button[onclick="showLatestHistoryDetail()"]');
-    if(reviewBtn) reviewBtn.onclick = () => {
+    if (reviewBtn) reviewBtn.onclick = () => {
         const history = storageService.getHistory();
-        if(history.length > 0) handleShowHistoryDetail(history[0]);
+        if (history.length > 0) handleShowHistoryDetail(history[0]);
     };
 
     const restartBtn = document.querySelector('button[onclick="restartSameMode()"]');
-    if(restartBtn) restartBtn.onclick = () => startGame(quizService.getGameResults().mode);
+    if (restartBtn) restartBtn.onclick = () => startGame(quizService.getGameResults().mode);
 
     const backMenuBtn = document.querySelector('button[onclick="backToMenu()"]');
-    if(backMenuBtn) backMenuBtn.onclick = backToMenu;
+    if (backMenuBtn) backMenuBtn.onclick = backToMenu;
 }
 
 // ---- 控制器邏輯 ----
@@ -140,7 +140,7 @@ function startGame(mode) {
     const customCount = ui.els.customCountInput().value;
 
     quizService.startNewGame(mode, countSelect, customCount, filteredWords);
-    
+
     ui.els.score().textContent = `得分: 0`;
     ui.hideAllScreens();
     ui.showScreen(ui.els.headerInfo());
@@ -163,11 +163,11 @@ function loadFlashcard() {
         handleEndGame();
         return;
     }
-    
+
     ui.els.progress().textContent = `進度: ${qData.index + 1} / ${qData.total}`;
     isFlashcardFlipped = false;
     ui.renderFlashcard(qData.word, isFlashcardFlipped);
-    
+
     // 自動唸字
     audioService.playAudio(qData.word.word);
 }
@@ -177,7 +177,7 @@ function handleFlipFlashcard() {
     isFlashcardFlipped = true;
     const qData = quizService.getCurrentQuestion();
     ui.renderFlashcard(qData.word, isFlashcardFlipped);
-    
+
     // 翻開後發音
     audioService.playAudio(qData.word.word);
 }
@@ -190,21 +190,21 @@ function handleFlashcardResult(knewIt) {
 
 function loadQuestion() {
     const qData = quizService.getCurrentQuestion();
-    
+
     if (!qData) {
         handleEndGame();
         return;
     }
 
     ui.els.progress().textContent = `進度: ${qData.index + 1} / ${qData.total}`;
-    
+
     ui.resetInputs();
     ui.hideAllScreens();
     ui.showScreen(ui.els.headerInfo());
     ui.showScreen(ui.els.quizContainer());
-    
+
     ui.renderQuestion(qData.word, qData.type);
-    
+
     if (qData.type === 'audio') {
         const audioBtn = document.getElementById('play-audio-btn');
         if (audioBtn) {
@@ -212,17 +212,17 @@ function loadQuestion() {
         }
         audioService.playAudio(qData.word.word);
     }
-    
+
     ui.focusInput(qData.type);
 }
 
 function handleSubmitAnswer() {
     const jpVal = ui.els.inputJp().value.trim();
     const zhVal = ui.els.inputZh().value.trim();
-    
+
     const result = quizService.checkAnswer(jpVal, zhVal);
     ui.renderFeedback(result.isCorrect, result.currentWord, result.newScore);
-    
+
     audioService.playAudio(result.currentWord.word);
 }
 
@@ -236,7 +236,27 @@ function handleEndGame() {
     storageService.saveToHistory(
         storageService.createRecord(results.mode, results.score, results.totalQuestions, results.details)
     );
-    ui.renderEndScreen(results.score);
+    ui.renderEndScreen(results);
+}
+
+function retryMistakes() {
+    const status = quizService.startMistakesGame();
+    if (!status) return; // 如果沒有錯題就不該點到這個按鈕，防呆
+
+    const mode = quizService.getGameResults().mode;
+
+    ui.els.score().textContent = `得分: 0`;
+    ui.hideAllScreens();
+    ui.showScreen(ui.els.headerInfo());
+
+    if (mode === 'flashcard') {
+        ui.showScreen(ui.els.flashcardContainer());
+        isFlashcardFlipped = false;
+        loadFlashcard();
+    } else {
+        ui.showScreen(ui.els.quizContainer());
+        loadQuestion();
+    }
 }
 
 function handleShowHistoryList() {
@@ -256,7 +276,7 @@ function handleShowHistoryDetail(record) {
 function handleShowVocabList() {
     ui.hideAllScreens();
     ui.showScreen(ui.els.vocabScreen());
-    
+
     // 初始化單字庫的下拉選單並渲染
     handleVocabLevelChange();
 }
@@ -317,7 +337,7 @@ function handleKeydown(event) {
             const jpVal = ui.els.inputJp().value.trim();
             const zhVal = ui.els.inputZh().value.trim();
             const type = qData ? qData.type : 'zh-to-jp';
-            
+
             let canSubmit = false;
             if (type === 'zh-to-jp') canSubmit = (jpVal !== '');
             else if (type === 'jp-to-zh') canSubmit = (zhVal !== '');
@@ -327,7 +347,7 @@ function handleKeydown(event) {
                 event.preventDefault();
                 handleSubmitAnswer();
             }
-        } 
+        }
         else if (!quizContainer.classList.contains('hidden') && !feedbackBox.classList.contains('hidden')) {
             // 在看答案狀態，按 Enter 到下一題
             event.preventDefault();
@@ -338,6 +358,7 @@ function handleKeydown(event) {
 
 // 頁面載入完成後初始化
 window.addEventListener('DOMContentLoaded', () => {
+    window.retryMistakes = retryMistakes;
     setupEventListeners();
     handleLevelChange(); // 初始化下拉選項與題數
 });

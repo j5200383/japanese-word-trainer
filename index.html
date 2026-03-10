@@ -1,18 +1,43 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>日文單字打字練習</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .perspective-1000 { -webkit-perspective: 1000px; perspective: 1000px; }
-        .transform-style-3d { -webkit-transform-style: preserve-3d; transform-style: preserve-3d; transition: -webkit-transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); }
-        .backface-hidden { -webkit-backface-visibility: hidden; backface-visibility: hidden; }
-        .front-face { -webkit-transform: rotateY(0deg) translateZ(1px); transform: rotateY(0deg) translateZ(1px); }
-        .back-face { -webkit-transform: rotateY(180deg) translateZ(1px); transform: rotateY(180deg) translateZ(1px); }
-        .rotate-y-180 { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); }
-        
+        .perspective-1000 {
+            -webkit-perspective: 1000px;
+            perspective: 1000px;
+        }
+
+        .transform-style-3d {
+            -webkit-transform-style: preserve-3d;
+            transform-style: preserve-3d;
+            transition: -webkit-transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+
+        .backface-hidden {
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        .front-face {
+            -webkit-transform: rotateY(0deg) translateZ(1px);
+            transform: rotateY(0deg) translateZ(1px);
+        }
+
+        .back-face {
+            -webkit-transform: rotateY(180deg) translateZ(1px);
+            transform: rotateY(180deg) translateZ(1px);
+        }
+
+        .rotate-y-180 {
+            -webkit-transform: rotateY(180deg);
+            transform: rotateY(180deg);
+        }
+
         /* Safari 自訂下拉選單箭頭 */
         .custom-select {
             -webkit-appearance: none;
@@ -26,13 +51,17 @@
         }
     </style>
 </head>
+
 <body class="bg-slate-100 min-h-screen font-sans flex flex-col items-center justify-center p-4">
 
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden p-6 min-h-[500px] flex flex-col relative max-h-[90vh]">
-        
+    <div
+        class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden p-6 min-h-[500px] flex flex-col relative max-h-[90vh]">
+
         <!-- 頂部資訊：進度與計分 -->
-        <div id="header-info" class="hidden justify-between items-center mb-4 text-slate-500 font-medium w-full shrink-0">
-            <button onclick="quitQuiz()" class="text-slate-500 hover:text-rose-600 transition flex items-center gap-1 text-sm font-bold bg-slate-100 hover:bg-rose-100 px-3 py-1.5 rounded-lg">
+        <div id="header-info"
+            class="hidden justify-between items-center mb-4 text-slate-500 font-medium w-full shrink-0">
+            <button onclick="quitQuiz()"
+                class="text-slate-500 hover:text-rose-600 transition flex items-center gap-1 text-sm font-bold bg-slate-100 hover:bg-rose-100 px-3 py-1.5 rounded-lg">
                 🏠 首頁
             </button>
             <div id="progress">進度: 1 / 5</div>
@@ -43,29 +72,32 @@
         <div id="start-screen" class="flex flex-col items-center w-full flex-grow py-4 overflow-y-auto">
             <h1 class="text-2xl font-bold text-slate-800 mb-2 shrink-0">日文單字特訓</h1>
             <p class="text-slate-500 mb-6 text-sm shrink-0">請選擇您想要練習的模式</p>
-            
+
             <!-- 單字級別與課別雙層選擇區塊 -->
             <div class="w-full mb-3 shrink-0 flex flex-col sm:flex-row gap-3">
                 <div class="flex-1">
                     <label class="block text-sm font-medium text-slate-600 mb-2">單字級別：</label>
-                    <select id="jlpt-level" onchange="updateLessonDropdown()" class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-white cursor-pointer font-bold">
+                    <select id="jlpt-level" onchange="updateLessonDropdown()"
+                        class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-white cursor-pointer font-bold">
                         <option value="all">全部級別</option>
                         <option value="N5">N5 (入門)</option>
                         <option value="N4">N4 (初級)</option>
                     </select>
                 </div>
-                
+
                 <!-- 動態顯示的課別選單 -->
                 <div class="flex-1 hidden" id="lesson-container">
                     <label class="block text-sm font-medium text-slate-600 mb-2">課別：</label>
-                    <select id="lesson-select" onchange="updateWordCountDisplay()" class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-white cursor-pointer font-bold">
+                    <select id="lesson-select" onchange="updateWordCountDisplay()"
+                        class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-white cursor-pointer font-bold">
                         <option value="all">全部</option>
                     </select>
                 </div>
             </div>
 
             <!-- 目前範圍單字總數顯示卡片 -->
-            <div class="w-full bg-indigo-50 border border-indigo-100 text-indigo-700 px-4 py-3 rounded-xl mb-4 flex justify-between items-center shadow-sm shrink-0">
+            <div
+                class="w-full bg-indigo-50 border border-indigo-100 text-indigo-700 px-4 py-3 rounded-xl mb-4 flex justify-between items-center shadow-sm shrink-0">
                 <span class="text-sm font-bold flex items-center gap-2">
                     <span>📚</span> 該範圍單字總數：
                 </span>
@@ -75,55 +107,67 @@
             <!-- 題數選擇區塊 (加入自訂選項) -->
             <div class="w-full mb-4 shrink-0">
                 <label class="block text-sm font-medium text-slate-600 mb-2">測驗題數：</label>
-                <select id="question-count" onchange="toggleCustomCount()" class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-white cursor-pointer font-bold mb-2">
+                <select id="question-count" onchange="toggleCustomCount()"
+                    class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-white cursor-pointer font-bold mb-2">
                     <option value="5">5 題 (快速暖身)</option>
                     <option value="10">10 題 (小考)</option>
                     <option value="20">20 題 (深度記憶)</option>
                     <option value="all">全部單字</option>
                     <option value="custom">✍️ 自訂題數...</option>
                 </select>
-                
-                <!-- 自訂題數輸入框 (預設隱藏) -->
-            <div id="custom-count-container" class="hidden">
-                <input type="number" id="custom-count-input" min="1" placeholder="請輸入題數 (例如: 15)" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-lg text-slate-700 bg-slate-50">
-            </div>
-        </div>
 
-        <!-- 🌟 模式選擇按鈕 (優化版：徹底修復窄螢幕文字跑版問題) -->
-        <div class="w-full space-y-3 mb-6 shrink-0">
-            <button onclick="startGame('flashcard')" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 border-2 border-rose-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between">
-                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">📇</span>
-                <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">閃卡記憶模式</span>
-                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🔄</span>
-            </button>
-            <button onclick="startGame('zh-to-jp')" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border-2 border-blue-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between mt-2">
-                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🇹🇼</span>
-                <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">看中文 ➔ 打日文</span>
-                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">📝</span>
-            </button>
-            <button onclick="startGame('jp-to-zh')" class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-2 border-emerald-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between">
-                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🇯🇵</span>
-                <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">看日文 ➔ 打中文</span>
-                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">📝</span>
-            </button>
-            <button onclick="startGame('audio')" class="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 border-2 border-purple-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between">
-                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🎧</span>
-                <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">聽發音 ➔ 打日、中</span>
-                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🗣️</span>
-            </button>
-            <button onclick="startGame('mixed')" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-700 border-2 border-amber-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between mt-2">
-                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🔀</span>
-                <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">綜合混合練習</span>
-                <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🎲</span>
-            </button>
-        </div>
+                <!-- 自訂題數輸入框 (預設隱藏) -->
+                <div id="custom-count-container" class="hidden">
+                    <input type="number" id="custom-count-input" min="1" placeholder="請輸入題數 (例如: 15)"
+                        class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-lg text-slate-700 bg-slate-50">
+                </div>
+            </div>
+
+            <!-- 🌟 模式選擇按鈕 (優化版：徹底修復窄螢幕文字跑版問題) -->
+            <div class="w-full space-y-3 mb-6 shrink-0">
+                <button onclick="startGame('flashcard')"
+                    class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 border-2 border-rose-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between">
+                    <span class="text-lg sm:text-xl shrink-0 w-8 text-center">📇</span>
+                    <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">閃卡記憶模式</span>
+                    <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🔄</span>
+                </button>
+                <button onclick="startGame('zh-to-jp')"
+                    class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border-2 border-blue-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between mt-2">
+                    <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🇹🇼</span>
+                    <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">看中文 ➔
+                        打日文</span>
+                    <span class="text-lg sm:text-xl shrink-0 w-8 text-center">📝</span>
+                </button>
+                <button onclick="startGame('jp-to-zh')"
+                    class="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-2 border-emerald-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between">
+                    <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🇯🇵</span>
+                    <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">看日文 ➔
+                        打中文</span>
+                    <span class="text-lg sm:text-xl shrink-0 w-8 text-center">📝</span>
+                </button>
+                <button onclick="startGame('audio')"
+                    class="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 border-2 border-purple-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between">
+                    <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🎧</span>
+                    <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">聽發音 ➔
+                        打日、中</span>
+                    <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🗣️</span>
+                </button>
+                <button onclick="startGame('mixed')"
+                    class="w-full bg-amber-50 hover:bg-amber-100 text-amber-700 border-2 border-amber-200 py-3 px-2 sm:px-4 rounded-xl font-bold transition flex items-center justify-between mt-2">
+                    <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🔀</span>
+                    <span class="text-sm sm:text-base whitespace-nowrap tracking-tight flex-1 text-center">綜合混合練習</span>
+                    <span class="text-lg sm:text-xl shrink-0 w-8 text-center">🎲</span>
+                </button>
+            </div>
 
             <!-- 歷史成績按鈕 -->
             <div class="w-full flex gap-3 shrink-0">
-                <button onclick="showHistoryList()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 px-4 rounded-xl font-bold transition flex items-center justify-center gap-2">
+                <button onclick="showHistoryList()"
+                    class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 px-4 rounded-xl font-bold transition flex items-center justify-center gap-2">
                     📊 歷史成績
                 </button>
-                <button id="btn-browse-vocab" class="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-3 px-4 rounded-xl font-bold transition flex items-center justify-center gap-2 border-2 border-indigo-200">
+                <button id="btn-browse-vocab"
+                    class="flex-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 py-3 px-4 rounded-xl font-bold transition flex items-center justify-center gap-2 border-2 border-indigo-200">
                     📖 瀏覽單字庫
                 </button>
             </div>
@@ -131,27 +175,34 @@
 
         <!-- 測驗主體區塊 -->
         <div id="quiz-container" class="hidden flex-col items-center w-full flex-grow overflow-y-auto pb-4 px-1">
-            <span id="question-type-badge" class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold mb-4 shrink-0 mt-2">
+            <span id="question-type-badge"
+                class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold mb-4 shrink-0 mt-2">
                 題型標籤
             </span>
 
-            <div id="prompt-area" class="w-full flex justify-center items-center min-h-[5rem] mb-6 text-center shrink-0">
+            <div id="prompt-area"
+                class="w-full flex justify-center items-center min-h-[5rem] mb-6 text-center shrink-0">
                 <!-- 內容會由 JS 動態生成 -->
             </div>
 
             <div class="w-full space-y-4 mb-6 shrink-0">
                 <div id="jp-input-container">
                     <label class="block text-sm font-medium text-slate-600 mb-1">輸入日文 (漢字或平假名)</label>
-                    <input type="text" id="input-jp" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-lg" placeholder="例：たべる 或 食べる" autocomplete="off">
+                    <input type="text" id="input-jp"
+                        class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-lg"
+                        placeholder="例：たべる 或 食べる" autocomplete="off">
                 </div>
-                
+
                 <div id="zh-input-container">
                     <label class="block text-sm font-medium text-slate-600 mb-1">輸入中文意思</label>
-                    <input type="text" id="input-zh" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-lg" placeholder="請輸入中文..." autocomplete="off">
+                    <input type="text" id="input-zh"
+                        class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-lg"
+                        placeholder="請輸入中文..." autocomplete="off">
                 </div>
             </div>
 
-            <button id="submit-btn" onclick="checkAnswer()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md mt-auto shrink-0">
+            <button id="submit-btn" onclick="checkAnswer()"
+                class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md mt-auto shrink-0">
                 送出答案
             </button>
 
@@ -163,7 +214,8 @@
                     <p>讀音： <span id="ans-kana" class="font-bold text-lg"></span></p>
                     <p>中文： <span id="ans-zh" class="font-bold text-lg"></span></p>
                 </div>
-                <button onclick="nextQuestion()" id="next-btn" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-900 transition shadow-md">
+                <button onclick="nextQuestion()" id="next-btn"
+                    class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-900 transition shadow-md">
                     下一題
                 </button>
             </div>
@@ -174,34 +226,49 @@
             <span class="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-xs font-bold mb-4 shrink-0 mt-2">
                 📇 模式：閃卡記憶
             </span>
-            
+
             <!-- 3D 翻轉卡片容器 -->
-            <div class="relative w-full h-64 perspective-1000 cursor-pointer mb-8 shrink-0 mt-4 group" id="flashcard-box">
-                <div id="flashcard-inner" class="w-full h-full absolute top-0 left-0 transform-style-3d shadow-lg rounded-2xl">
+            <div class="relative w-full h-64 perspective-1000 cursor-pointer mb-8 shrink-0 mt-4 group"
+                id="flashcard-box">
+                <div id="flashcard-inner"
+                    class="w-full h-full absolute top-0 left-0 transform-style-3d shadow-lg rounded-2xl">
                     <!-- 正面 -->
-                    <div class="absolute w-full h-full backface-hidden front-face bg-white border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-center px-12 py-6 text-center group/card">
+                    <div
+                        class="absolute w-full h-full backface-hidden front-face bg-white border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-center px-12 py-6 text-center group/card">
                         <!-- 發音播放鈕 (正面) -->
-                        <button id="fc-play-front" class="absolute top-4 right-4 text-slate-400 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 p-2 rounded-full transition shadow-sm z-10" title="播放發音">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z" />
+                        <button id="fc-play-front"
+                            class="absolute top-4 right-4 text-slate-400 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 p-2 rounded-full transition shadow-sm z-10"
+                            title="播放發音">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z" />
                             </svg>
                         </button>
-                        
+
                         <p class="text-slate-400 text-sm mb-2 mt-4">日文單字</p>
-                        <h2 id="fc-front-word" class="text-4xl sm:text-5xl font-bold text-slate-800 break-words w-full"></h2>
+                        <h2 id="fc-front-word" class="text-4xl sm:text-5xl font-bold text-slate-800 break-words w-full">
+                        </h2>
                         <p class="text-slate-400 text-xs mt-auto">點擊卡片翻面</p>
                     </div>
                     <!-- 背面 -->
-                    <div class="absolute w-full h-full backface-hidden back-face bg-white border-2 border-rose-200 rounded-2xl flex flex-col items-center justify-center px-12 py-6 text-center">
+                    <div
+                        class="absolute w-full h-full backface-hidden back-face bg-white border-2 border-rose-200 rounded-2xl flex flex-col items-center justify-center px-12 py-6 text-center">
                         <!-- 發音播放鈕 (背面) -->
-                        <button id="fc-play-back" class="absolute top-4 right-4 text-slate-400 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 p-2 rounded-full transition shadow-sm z-10" title="播放發音">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z" />
+                        <button id="fc-play-back"
+                            class="absolute top-4 right-4 text-slate-400 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 p-2 rounded-full transition shadow-sm z-10"
+                            title="播放發音">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z" />
                             </svg>
                         </button>
-                        
-                        <h2 id="fc-back-word" class="text-2xl sm:text-3xl font-bold text-slate-800 mb-2 mt-4 break-words w-full"></h2>
-                        <p id="fc-back-kana" class="text-lg sm:text-xl text-indigo-600 font-bold mb-4 break-words w-full"></p>
+
+                        <h2 id="fc-back-word"
+                            class="text-2xl sm:text-3xl font-bold text-slate-800 mb-2 mt-4 break-words w-full"></h2>
+                        <p id="fc-back-kana"
+                            class="text-lg sm:text-xl text-indigo-600 font-bold mb-4 break-words w-full"></p>
                         <hr class="w-full border-slate-200 mb-4">
                         <p id="fc-back-zh" class="text-xl sm:text-2xl text-slate-700 font-bold break-words w-full"></p>
                     </div>
@@ -210,17 +277,20 @@
 
             <!-- 閃卡按鈕區塊 -->
             <div id="fc-controls-front" class="w-full mt-auto">
-                <button id="btn-fc-flip" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition flex items-center justify-center gap-2 shadow-md">
+                <button id="btn-fc-flip"
+                    class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition flex items-center justify-center gap-2 shadow-md">
                     翻開看答案
                 </button>
             </div>
-            
+
             <div id="fc-controls-back" class="hidden w-full mt-auto gap-3 flex shrink-0 pb-2">
-                <button id="btn-fc-forgot" class="flex-1 bg-rose-100 hover:bg-rose-200 text-rose-700 py-4 rounded-xl font-bold transition flex flex-col items-center justify-center shadow-sm border-2 border-rose-200">
+                <button id="btn-fc-forgot"
+                    class="flex-1 bg-rose-100 hover:bg-rose-200 text-rose-700 py-4 rounded-xl font-bold transition flex flex-col items-center justify-center shadow-sm border-2 border-rose-200">
                     <span class="text-xl mb-1">❌</span>
                     <span>不熟 (重測)</span>
                 </button>
-                <button id="btn-fc-remembered" class="flex-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 py-4 rounded-xl font-bold transition flex flex-col items-center justify-center shadow-sm border-2 border-emerald-200">
+                <button id="btn-fc-remembered"
+                    class="flex-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 py-4 rounded-xl font-bold transition flex flex-col items-center justify-center shadow-sm border-2 border-emerald-200">
                     <span class="text-xl mb-1">✅</span>
                     <span>記得 (下一個)</span>
                 </button>
@@ -230,16 +300,24 @@
         <!-- 結束畫面 -->
         <div id="end-screen" class="hidden flex-col items-center justify-center py-8 flex-grow">
             <h2 class="text-3xl font-bold text-slate-800 mb-4">練習完成！🎉</h2>
-            <p class="text-lg text-slate-600 mb-8">最終得分：<span id="final-score" class="font-bold text-indigo-600 text-2xl">0</span></p>
-            
+            <p class="text-lg text-slate-600 mb-8">最終得分：<span id="final-score"
+                    class="font-bold text-indigo-600 text-2xl">0</span></p>
+
             <div class="w-full space-y-3">
-                <button onclick="showLatestHistoryDetail()" class="w-full bg-emerald-50 text-emerald-700 border-2 border-emerald-200 py-3 rounded-xl font-bold hover:bg-emerald-100 transition shadow-md">
+                <button onclick="showLatestHistoryDetail()"
+                    class="w-full bg-emerald-50 text-emerald-700 border-2 border-emerald-200 py-3 rounded-xl font-bold hover:bg-emerald-100 transition shadow-md">
                     📝 檢討本次作答
                 </button>
-                <button onclick="restartSameMode()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md">
+                <button id="btn-retry-mistakes" onclick="retryMistakes()"
+                    class="hidden w-full bg-rose-50 hover:bg-rose-100 text-rose-700 border-2 border-rose-200 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm">
+                    <span class="text-xl">❌</span> 剛才錯的再練習一次
+                </button>
+                <button onclick="restartSameMode()"
+                    class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md">
                     🔄 再練習一次 (同模式)
                 </button>
-                <button onclick="backToMenu()" class="w-full bg-slate-200 text-slate-700 py-3 rounded-xl font-bold hover:bg-slate-300 transition">
+                <button onclick="backToMenu()"
+                    class="w-full bg-slate-200 text-slate-700 py-3 rounded-xl font-bold hover:bg-slate-300 transition">
                     🏠 回主選單
                 </button>
             </div>
@@ -249,13 +327,17 @@
         <div id="history-screen" class="hidden flex-col w-full flex-grow overflow-hidden">
             <div class="flex items-center mb-4 shrink-0">
                 <button onclick="backToMenuFromHistory()" class="text-slate-500 hover:text-indigo-600 p-2 -ml-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
                 </button>
                 <h2 class="text-xl font-bold text-slate-800 ml-2">歷史成績</h2>
             </div>
-            
+
             <div class="mb-4 shrink-0">
-                <select id="history-filter" class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-slate-50 font-bold">
+                <select id="history-filter"
+                    class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-slate-50 font-bold">
                     <option value="all">顯示所有模式</option>
                     <option value="flashcard">📇 閃卡記憶模式</option>
                     <option value="zh-to-jp">🇹🇼 看中文 ➔ 打日文</option>
@@ -264,7 +346,7 @@
                     <option value="mixed">🔀 綜合混合練習</option>
                 </select>
             </div>
-            
+
             <div id="history-list" class="w-full flex-grow overflow-y-auto space-y-3 pb-4 pr-1"></div>
         </div>
 
@@ -272,10 +354,14 @@
         <div id="history-detail-screen" class="hidden flex-col w-full flex-grow overflow-hidden">
             <div class="flex items-center mb-4 shrink-0">
                 <button onclick="backToHistoryList()" class="text-slate-500 hover:text-indigo-600 p-2 -ml-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
                 </button>
                 <h2 class="text-xl font-bold text-slate-800 ml-2">作答檢討</h2>
-                <span id="detail-score-badge" class="ml-auto bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold"></span>
+                <span id="detail-score-badge"
+                    class="ml-auto bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold"></span>
             </div>
             <div id="history-detail-list" class="w-full flex-grow overflow-y-auto space-y-4 pb-4 pr-1"></div>
         </div>
@@ -284,21 +370,26 @@
         <div id="vocab-screen" class="hidden flex-col w-full flex-grow overflow-hidden">
             <div class="flex items-center mb-4 shrink-0">
                 <button id="btn-back-from-vocab" class="text-slate-500 hover:text-indigo-600 p-2 -ml-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
                 </button>
                 <h2 class="text-xl font-bold text-slate-800 ml-2">單字庫</h2>
             </div>
-            
+
             <div class="w-full mb-3 shrink-0 flex flex-col sm:flex-row gap-3">
                 <div class="flex-1">
-                    <select id="vocab-level" class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-slate-50 font-bold mb-2 sm:mb-0">
+                    <select id="vocab-level"
+                        class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-slate-50 font-bold mb-2 sm:mb-0">
                         <option value="all">全部級別</option>
                         <option value="N5">N5 (入門)</option>
                         <option value="N4">N4 (初級)</option>
                     </select>
                 </div>
                 <div class="flex-1" id="vocab-lesson-container">
-                    <select id="vocab-lesson" class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-slate-50 font-bold">
+                    <select id="vocab-lesson"
+                        class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-slate-50 font-bold">
                         <option value="all">全部</option>
                     </select>
                 </div>
@@ -311,4 +402,5 @@
 
     <script type="module" src="./js/main.js"></script>
 </body>
+
 </html>

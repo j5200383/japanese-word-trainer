@@ -21,7 +21,7 @@ export function startNewGame(mode, countSelect, customCount, filteredWords) {
     currentIndex = 0;
     score = 0;
     currentSessionDetails = [];
-    
+
     let count;
     if (countSelect === 'all') {
         count = filteredWords.length;
@@ -38,10 +38,10 @@ export function startNewGame(mode, countSelect, customCount, filteredWords) {
         count = parseInt(countSelect, 10);
         if (count > filteredWords.length) count = filteredWords.length;
     }
-    
+
     let shuffled = [...filteredWords].sort(() => 0.5 - Math.random());
     currentQuizList = shuffled.slice(0, count);
-    
+
     return {
         totalQuestions: currentQuizList.length
     };
@@ -53,7 +53,7 @@ export function getCurrentQuestion() {
     }
 
     const currentWord = currentQuizList[currentIndex];
-    
+
     if (selectedMode === 'mixed') {
         const types = ['zh-to-jp', 'jp-to-zh', 'audio'];
         currentQuestionType = types[Math.floor(Math.random() * types.length)];
@@ -71,7 +71,7 @@ export function getCurrentQuestion() {
 
 export function checkAnswer(userJp, userZh) {
     const currentWord = currentQuizList[currentIndex];
-    
+
     let isCorrect = false;
     // 判斷日文輸入是否正確 (可接受漢字或平假名)
     const jpCorrect = (userJp === currentWord.word || userJp === currentWord.kana);
@@ -101,7 +101,7 @@ export function checkAnswer(userJp, userZh) {
 
 export function handleFlashcardAnswer(knewIt) {
     const currentWord = currentQuizList[currentIndex];
-    
+
     if (knewIt) {
         score += 10;
         currentSessionDetails.push({
@@ -126,6 +126,28 @@ export function handleFlashcardAnswer(knewIt) {
 
 export function moveToNextQuestion() {
     currentIndex++;
+}
+
+export function startMistakesGame() {
+    // 篩選出剛才答錯的題目
+    const mistakes = currentSessionDetails
+        .filter(detail => !detail.isCorrect)
+        .map(detail => detail.wordObj);
+
+    // 移除陣列中可能重複的物件 (因為閃卡可能同一個單字錯多次)
+    const uniqueMistakes = Array.from(new Set(mistakes));
+
+    if (uniqueMistakes.length === 0) return false;
+
+    // 將錯題重新洗牌作為新的考題
+    currentQuizList = [...uniqueMistakes].sort(() => 0.5 - Math.random());
+    currentIndex = 0;
+    score = 0;
+    currentSessionDetails = []; // 清空之前的紀錄，開始新的回合
+
+    return {
+        totalQuestions: currentQuizList.length
+    };
 }
 
 export function getGameResults() {

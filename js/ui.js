@@ -65,12 +65,12 @@ export const els = {
 
 export function hideAllScreens() {
     const screens = [
-        els.startScreen(), els.headerInfo(), els.quizContainer(), 
+        els.startScreen(), els.headerInfo(), els.quizContainer(),
         els.feedbackBox(), els.endScreen(), els.historyScreen(), els.historyDetailScreen(),
         els.flashcardContainer(), els.vocabScreen()
     ];
     screens.forEach(s => {
-        if(s) {
+        if (s) {
             s.classList.add('hidden');
             s.classList.remove('flex');
         }
@@ -87,7 +87,7 @@ export function showScreen(screenEl, displayStyle = 'flex') {
 export function updateLessonDropdown(lessonDataList) {
     const lessonContainerEl = els.lessonContainer();
     const lessonSelectEl = els.lessonSelect();
-    
+
     if (lessonDataList && lessonDataList.length > 0) {
         lessonContainerEl.classList.remove('hidden');
         lessonSelectEl.innerHTML = '';
@@ -106,7 +106,7 @@ export function updateLessonDropdown(lessonDataList) {
 export function updateVocabLessonDropdown(lessonDataList) {
     const lessonContainerEl = els.vocabLessonContainer();
     const lessonSelectEl = els.vocabLessonSelect();
-    
+
     if (lessonDataList && lessonDataList.length > 0) {
         lessonContainerEl.classList.remove('hidden');
         lessonSelectEl.innerHTML = '';
@@ -233,13 +233,13 @@ export function renderFeedback(isCorrect, currentWord, newScore) {
     els.inputJp().disabled = true;
     els.inputZh().disabled = true;
     els.submitBtn().classList.add('hidden');
-    
+
     const feedbackBox = els.feedbackBox();
     feedbackBox.classList.remove('hidden');
     feedbackBox.classList.add('flex');
-    
+
     const titleEl = els.feedbackTitle();
-    
+
     if (isCorrect) {
         els.score().textContent = `得分: ${newScore}`;
         feedbackBox.className = "flex w-full mt-auto p-5 rounded-xl border-2 flex-col border-emerald-300 bg-emerald-50 shrink-0";
@@ -261,9 +261,23 @@ export function renderFeedback(isCorrect, currentWord, newScore) {
     }, 50);
 }
 
-export function renderEndScreen(finalScore) {
+export function renderEndScreen(results) {
     hideAllScreens();
-    els.finalScore().textContent = finalScore;
+    els.finalScore().textContent = results.score;
+
+    // 判斷是否要顯示錯題重測按鈕
+    const btnRetry = document.getElementById('btn-retry-mistakes');
+    if (btnRetry) {
+        // 如果分數不是滿分，代表有錯題
+        if (results.score < results.totalQuestions * 10) {
+            btnRetry.classList.remove('hidden');
+            btnRetry.classList.add('flex');
+        } else {
+            btnRetry.classList.add('hidden');
+            btnRetry.classList.remove('flex');
+        }
+    }
+
     showScreen(els.endScreen());
 }
 
@@ -282,7 +296,7 @@ export function renderHistoryList(history, showHistoryDetailCallback) {
         const item = document.createElement('div');
         item.className = "bg-white border-2 border-slate-100 p-4 rounded-xl flex items-center justify-between cursor-pointer hover:border-indigo-300 hover:shadow-md transition";
         item.addEventListener('click', () => showHistoryDetailCallback(record));
-        
+
         item.innerHTML = `
             <div>
                 <div class="text-xs text-slate-400 mb-1">${record.date}</div>
@@ -309,7 +323,7 @@ export function renderHistoryDetail(record) {
         const isCorr = detail.isCorrect;
         const card = document.createElement('div');
         card.className = `p-4 rounded-xl border-2 ${isCorr ? 'border-emerald-200 bg-emerald-50/30' : 'border-rose-200 bg-rose-50/50'}`;
-        
+
         let userAnsHtml = '';
         if (detail.type === 'zh-to-jp') {
             userAnsHtml = `<p class="text-sm text-slate-600">你的輸入：<span class="font-bold ${isCorr ? 'text-emerald-700' : 'text-rose-600'}">${detail.userJp || '(未填寫)'}</span></p>`;
@@ -323,7 +337,7 @@ export function renderHistoryDetail(record) {
         }
 
         const modeBadgeLabel = modeNames[detail.type] ? modeNames[detail.type].split('➔')[0] : '聽力';
-        
+
         let userInputBoxHtml = '';
         if (detail.type !== 'flashcard') {
             userInputBoxHtml = `
@@ -362,7 +376,7 @@ export function renderVocabList(words) {
     words.forEach((wordObj, index) => {
         const item = document.createElement('div');
         item.className = "bg-white border-2 border-slate-100 p-4 rounded-xl flex items-center justify-between hover:border-indigo-300 transition shadow-sm relative min-h-[100px]";
-        
+
         let levelBadge = '';
         const levelText = wordObj.level ? `${wordObj.level} 第${wordObj.lesson || '?'}課` : '未分類';
         levelBadge = `<span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-bold mb-2 inline-block">${levelText}</span>`;
