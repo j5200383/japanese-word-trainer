@@ -316,6 +316,41 @@ export function renderHistoryDetail(record) {
     showScreen(els.historyDetailScreen());
 
     els.detailScoreBadge().textContent = `${record.score} 分`;
+
+    // 檢查是否已經有重新作答按鈕，沒有就加上去
+    let headerContainer = els.historyDetailScreen().querySelector('.flex.items-center.mb-4');
+    let retryBtn = headerContainer.querySelector('#btn-retry-record');
+    let retryMistakesBtn = headerContainer.querySelector('#btn-retry-record-mistakes');
+
+    if (!retryBtn) {
+        retryBtn = document.createElement('button');
+        retryBtn.id = 'btn-retry-record';
+        retryBtn.className = 'ml-auto bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-2 border-indigo-200 px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm transition whitespace-nowrap shrink-0';
+        retryBtn.textContent = '重新作答全卷';
+        headerContainer.insertBefore(retryBtn, els.detailScoreBadge());
+    }
+
+    if (!retryMistakesBtn) {
+        retryMistakesBtn = document.createElement('button');
+        retryMistakesBtn.id = 'btn-retry-record-mistakes';
+        retryMistakesBtn.className = 'ml-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border-2 border-rose-200 px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm transition mr-2 whitespace-nowrap shrink-0';
+        retryMistakesBtn.textContent = '只練錯題';
+        headerContainer.insertBefore(retryMistakesBtn, els.detailScoreBadge());
+    }
+
+    // 如果滿分，就隱藏「只練錯題」按鈕
+    if (record.score === 100) {
+        retryMistakesBtn.classList.add('hidden');
+    } else {
+        retryMistakesBtn.classList.remove('hidden');
+    }
+
+    els.detailScoreBadge().classList.remove('ml-auto');
+    els.detailScoreBadge().classList.add('ml-2', 'whitespace-nowrap', 'shrink-0');
+
+    // 使 header 可以橫向捲動，避免過窄時按鈕太擠
+    headerContainer.classList.add('overflow-x-auto', 'pb-1');
+
     const historyDetailListEl = els.historyDetailList();
     historyDetailListEl.innerHTML = '';
 
@@ -350,8 +385,8 @@ export function renderHistoryDetail(record) {
         card.innerHTML = `
             <div class="flex items-start gap-3">
                 <div class="text-2xl mt-1">${isCorr ? '✅' : '❌'}</div>
-                <div class="flex-grow space-y-2">
-                    <div class="flex items-center gap-2">
+                <div class="flex-grow space-y-2 pr-2 bg-transparent">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <span class="bg-slate-200 text-slate-600 text-[10px] px-2 py-0.5 rounded">${modeBadgeLabel}</span>
                         <span class="font-bold text-slate-800">${detail.wordObj.word} (${detail.wordObj.kana})</span>
                     </div>
@@ -360,6 +395,7 @@ export function renderHistoryDetail(record) {
                 </div>
             </div>
         `;
+
         historyDetailListEl.appendChild(card);
     });
 }

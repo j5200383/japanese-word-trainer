@@ -271,6 +271,67 @@ function handleShowHistoryList() {
 
 function handleShowHistoryDetail(record) {
     ui.renderHistoryDetail(record);
+
+    // 綁定歷史紀錄整份重新作答的按鈕
+    const retryBtn = document.getElementById('btn-retry-record');
+    if (retryBtn) {
+        retryBtn.onclick = () => handleRetryRecord(record);
+    }
+
+    const retryMistakesBtn = document.getElementById('btn-retry-record-mistakes');
+    if (retryMistakesBtn) {
+        retryMistakesBtn.onclick = () => handleRetryMistakesRecord(record);
+    }
+}
+
+function handleRetryMistakesRecord(record) {
+    const mode = record.mode;
+
+    // 從這份歷史紀錄中篩選出答錯的單字
+    const mistakes = record.details.filter(d => !d.isCorrect).map(d => d.wordObj);
+    const uniqueMistakes = Array.from(new Set(mistakes));
+
+    if (uniqueMistakes.length === 0) return;
+
+    // 針對錯題重新測驗
+    quizService.startNewGame(mode, 'all', null, uniqueMistakes);
+
+    ui.els.score().textContent = `得分: 0`;
+    ui.hideAllScreens();
+    ui.showScreen(ui.els.headerInfo());
+
+    if (mode === 'flashcard') {
+        ui.showScreen(ui.els.flashcardContainer());
+        isFlashcardFlipped = false;
+        loadFlashcard();
+    } else {
+        ui.showScreen(ui.els.quizContainer());
+        loadQuestion();
+    }
+}
+
+function handleRetryRecord(record) {
+    const mode = record.mode;
+
+    // 從這份歷史紀錄中萃取出所有考過的單字（由於閃卡可能有重複題，需過濾唯一）
+    const allWords = record.details.map(d => d.wordObj);
+    const uniqueWords = Array.from(new Set(allWords));
+
+    // 使用原本這份考卷的單字清單重新測驗
+    quizService.startNewGame(mode, 'all', null, uniqueWords);
+
+    ui.els.score().textContent = `得分: 0`;
+    ui.hideAllScreens();
+    ui.showScreen(ui.els.headerInfo());
+
+    if (mode === 'flashcard') {
+        ui.showScreen(ui.els.flashcardContainer());
+        isFlashcardFlipped = false;
+        loadFlashcard();
+    } else {
+        ui.showScreen(ui.els.quizContainer());
+        loadQuestion();
+    }
 }
 
 // ---- 單字庫邏輯 ----
