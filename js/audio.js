@@ -44,11 +44,35 @@ if (window.speechSynthesis) {
     loadVoices();
 }
 
+let isAudioUnlocked = false;
+
+// 為了在 iOS / mobile Safari 上解鎖自動播放限制
+export function unlockAudio() {
+    if (isAudioUnlocked) return;
+
+    // 建立一個極短的無聲空白音頻來解鎖 AudioContext
+    const silentAudio = new Audio('data:audio/mp3;base64,//NExAAAAANIAAAAAExBTUUzLjEwMKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
+
+    // 同時也嘗試解鎖 SpeechSynthesis
+    if (window.speechSynthesis) {
+        const utterance = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(utterance);
+    }
+
+    silentAudio.play().then(() => {
+        isAudioUnlocked = true;
+    }).catch(err => {
+        console.warn('Audio unlock failed:', err);
+    });
+}
+
 /**
  * 核心播放邏輯：嘗試 Google，失敗則 Fallback
  */
 export function playAudio(text) {
     if (!text) return;
+
+    if (!isAudioUnlocked) unlockAudio();
 
     stopAudio();
 

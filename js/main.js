@@ -101,6 +101,12 @@ function setupEventListeners() {
 
     const backMenuBtn = document.querySelector('button[onclick="backToMenu()"]');
     if (backMenuBtn) backMenuBtn.onclick = backToMenu;
+
+    // 針對全域首次點擊的音訊解鎖，確保 iOS/Safari 有權限
+    document.body.addEventListener('click', function unlockOnFirstClick() {
+        audioService.unlockAudio();
+        document.body.removeEventListener('click', unlockOnFirstClick);
+    }, { once: true });
 }
 
 // ---- 控制器邏輯 ----
@@ -127,6 +133,9 @@ function handleCountModeChange(e) {
 }
 
 function startGame(mode) {
+    // 解鎖行動裝置音頻播放限制
+    audioService.unlockAudio();
+
     const level = ui.els.jlptLevelSelect().value;
     const lesson = ui.els.lessonSelect().value;
     const filteredWords = quizService.getFilteredWords(level, lesson);
