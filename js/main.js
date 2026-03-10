@@ -183,7 +183,8 @@ function handleFlipFlashcard() {
 }
 
 function handleFlashcardResult(knewIt) {
-    quizService.handleFlashcardAnswer(knewIt);
+    const newScore = quizService.handleFlashcardAnswer(knewIt);
+    ui.els.score().textContent = `得分: ${newScore}`;
     quizService.moveToNextQuestion();
     loadFlashcard();
 }

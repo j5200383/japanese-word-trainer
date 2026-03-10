@@ -269,7 +269,7 @@ export function renderEndScreen(results) {
     const btnRetry = document.getElementById('btn-retry-mistakes');
     if (btnRetry) {
         // 如果分數不是滿分，代表有錯題
-        if (results.score < results.totalQuestions * 10) {
+        if (results.score < 100) {
             btnRetry.classList.remove('hidden');
             btnRetry.classList.add('flex');
         } else {
@@ -303,7 +303,7 @@ export function renderHistoryList(history, showHistoryDetailCallback) {
                 <div class="font-bold text-slate-700">${modeNames[record.mode] || '未知模式'}</div>
             </div>
             <div class="text-right">
-                <div class="text-xl font-bold ${record.score === record.totalQuestions * 10 ? 'text-emerald-500' : 'text-indigo-600'}">${record.score} <span class="text-sm font-normal text-slate-400">分</span></div>
+                <div class="text-xl font-bold ${record.score === 100 ? 'text-emerald-500' : 'text-indigo-600'}">${record.score} <span class="text-sm font-normal text-slate-400">分</span></div>
             </div>
         `;
         historyListEl.appendChild(item);

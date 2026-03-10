@@ -1,7 +1,8 @@
 import { wordList } from './data.js';
 
 let currentIndex = 0;
-let score = 0;
+let correctCount = 0;
+let initialTotalQuestions = 0;
 let selectedMode = 'mixed';
 let currentQuestionType = 'zh-to-jp';
 let currentSessionDetails = [];
@@ -19,7 +20,7 @@ export function getFilteredWords(level, lesson) {
 export function startNewGame(mode, countSelect, customCount, filteredWords) {
     selectedMode = mode;
     currentIndex = 0;
-    score = 0;
+    correctCount = 0;
     currentSessionDetails = [];
 
     let count;
@@ -42,8 +43,10 @@ export function startNewGame(mode, countSelect, customCount, filteredWords) {
     let shuffled = [...filteredWords].sort(() => 0.5 - Math.random());
     currentQuizList = shuffled.slice(0, count);
 
+    initialTotalQuestions = currentQuizList.length;
+
     return {
-        totalQuestions: currentQuizList.length
+        totalQuestions: initialTotalQuestions
     };
 }
 
@@ -82,7 +85,7 @@ export function checkAnswer(userJp, userZh) {
     else if (currentQuestionType === 'jp-to-zh') isCorrect = zhCorrect;
     else if (currentQuestionType === 'audio') isCorrect = jpCorrect && zhCorrect;
 
-    if (isCorrect) score += 10;
+    if (isCorrect) correctCount++;
 
     currentSessionDetails.push({
         wordObj: currentWord,
@@ -92,36 +95,56 @@ export function checkAnswer(userJp, userZh) {
         isCorrect: isCorrect
     });
 
+    const currentScore = initialTotalQuestions > 0 ? Math.round((correctCount / initialTotalQuestions) * 100) : 0;
+
     return {
         isCorrect: isCorrect,
         currentWord: currentWord,
-        newScore: score
+        newScore: currentScore
     };
 }
 
 export function handleFlashcardAnswer(knewIt) {
     const currentWord = currentQuizList[currentIndex];
 
+    // 尋找是否歷史紀錄中已經有這題 (代表之前選過不熟)
+    const existingDetailIndex = currentSessionDetails.findIndex(detail => detail.wordObj.word === currentWord.word);
+
     if (knewIt) {
-        score += 10;
-        currentSessionDetails.push({
-            wordObj: currentWord,
-            type: 'flashcard',
-            userJp: '(記得)',
-            userZh: '(記得)',
-            isCorrect: true
-        });
+        correctCount++;
+        if (existingDetailIndex !== -1) {
+            // 更新已存在的紀錄
+            currentSessionDetails[existingDetailIndex].userJp = '(記得)';
+            currentSessionDetails[existingDetailIndex].userZh = '(記得)';
+            currentSessionDetails[existingDetailIndex].isCorrect = true;
+        } else {
+            // 新增紀錄
+            currentSessionDetails.push({
+                wordObj: currentWord,
+                type: 'flashcard',
+                userJp: '(記得)',
+                userZh: '(記得)',
+                isCorrect: true
+            });
+        }
     } else {
         // 如果不熟，塞回陣列尾端，之後會再測到
         currentQuizList.push(currentWord);
-        currentSessionDetails.push({
-            wordObj: currentWord,
-            type: 'flashcard',
-            userJp: '(不熟)',
-            userZh: '(不熟)',
-            isCorrect: false
-        });
+
+        if (existingDetailIndex === -1) {
+            // 只有第一次選不熟時，才加入歷史紀錄
+            currentSessionDetails.push({
+                wordObj: currentWord,
+                type: 'flashcard',
+                userJp: '(不熟)',
+                userZh: '(不熟)',
+                isCorrect: false
+            });
+        }
     }
+
+    const currentScore = initialTotalQuestions > 0 ? Math.round((correctCount / initialTotalQuestions) * 100) : 0;
+    return currentScore;
 }
 
 export function moveToNextQuestion() {
@@ -142,19 +165,21 @@ export function startMistakesGame() {
     // 將錯題重新洗牌作為新的考題
     currentQuizList = [...uniqueMistakes].sort(() => 0.5 - Math.random());
     currentIndex = 0;
-    score = 0;
+    correctCount = 0;
+    initialTotalQuestions = currentQuizList.length;
     currentSessionDetails = []; // 清空之前的紀錄，開始新的回合
 
     return {
-        totalQuestions: currentQuizList.length
+        totalQuestions: initialTotalQuestions
     };
 }
 
 export function getGameResults() {
+    const finalScore = initialTotalQuestions > 0 ? Math.round((correctCount / initialTotalQuestions) * 100) : 0;
     return {
-        score: score,
+        score: finalScore,
         mode: selectedMode,
-        totalQuestions: currentQuizList.length,
+        totalQuestions: initialTotalQuestions,
         details: currentSessionDetails
     };
 }
