@@ -6,10 +6,24 @@
     <title>日文單字打字練習</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .perspective-1000 { perspective: 1000px; }
-        .transform-style-3d { transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); }
-        .backface-hidden { backface-visibility: hidden; }
-        .rotate-y-180 { transform: rotateY(180deg); }
+        .perspective-1000 { -webkit-perspective: 1000px; perspective: 1000px; }
+        .transform-style-3d { -webkit-transform-style: preserve-3d; transform-style: preserve-3d; transition: -webkit-transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); }
+        .backface-hidden { -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+        .front-face { -webkit-transform: rotateY(0deg) translateZ(1px); transform: rotateY(0deg) translateZ(1px); }
+        .back-face { -webkit-transform: rotateY(180deg) translateZ(1px); transform: rotateY(180deg) translateZ(1px); }
+        .rotate-y-180 { -webkit-transform: rotateY(180deg); transform: rotateY(180deg); }
+        
+        /* Safari 自訂下拉選單箭頭 */
+        .custom-select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.2em;
+            padding-right: 2.5rem;
+        }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans flex flex-col items-center justify-center p-4">
@@ -34,7 +48,7 @@
             <div class="w-full mb-3 shrink-0 flex flex-col sm:flex-row gap-3">
                 <div class="flex-1">
                     <label class="block text-sm font-medium text-slate-600 mb-2">單字級別：</label>
-                    <select id="jlpt-level" onchange="updateLessonDropdown()" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-slate-700 bg-white cursor-pointer font-bold">
+                    <select id="jlpt-level" onchange="updateLessonDropdown()" class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-white cursor-pointer font-bold">
                         <option value="all">全部級別</option>
                         <option value="N5">N5 (入門)</option>
                         <option value="N4">N4 (初級)</option>
@@ -44,7 +58,7 @@
                 <!-- 動態顯示的課別選單 -->
                 <div class="flex-1 hidden" id="lesson-container">
                     <label class="block text-sm font-medium text-slate-600 mb-2">課別：</label>
-                    <select id="lesson-select" onchange="updateWordCountDisplay()" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-slate-700 bg-white cursor-pointer font-bold">
+                    <select id="lesson-select" onchange="updateWordCountDisplay()" class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-white cursor-pointer font-bold">
                         <option value="all">全部</option>
                     </select>
                 </div>
@@ -61,7 +75,7 @@
             <!-- 題數選擇區塊 (加入自訂選項) -->
             <div class="w-full mb-4 shrink-0">
                 <label class="block text-sm font-medium text-slate-600 mb-2">測驗題數：</label>
-                <select id="question-count" onchange="toggleCustomCount()" class="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-slate-700 bg-white cursor-pointer font-bold mb-2">
+                <select id="question-count" onchange="toggleCustomCount()" class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-white cursor-pointer font-bold mb-2">
                     <option value="5">5 題 (快速暖身)</option>
                     <option value="10">10 題 (小考)</option>
                     <option value="20">20 題 (深度記憶)</option>
@@ -165,7 +179,7 @@
             <div class="relative w-full h-64 perspective-1000 cursor-pointer mb-8 shrink-0 mt-4 group" id="flashcard-box">
                 <div id="flashcard-inner" class="w-full h-full absolute top-0 left-0 transform-style-3d shadow-lg rounded-2xl">
                     <!-- 正面 -->
-                    <div class="absolute w-full h-full backface-hidden bg-white border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-center px-12 py-6 text-center group/card">
+                    <div class="absolute w-full h-full backface-hidden front-face bg-white border-2 border-slate-200 rounded-2xl flex flex-col items-center justify-center px-12 py-6 text-center group/card">
                         <!-- 發音播放鈕 (正面) -->
                         <button id="fc-play-front" class="absolute top-4 right-4 text-slate-400 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 p-2 rounded-full transition shadow-sm z-10" title="播放發音">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -178,7 +192,7 @@
                         <p class="text-slate-400 text-xs mt-auto">點擊卡片翻面</p>
                     </div>
                     <!-- 背面 -->
-                    <div class="absolute w-full h-full backface-hidden bg-white border-2 border-rose-200 rounded-2xl flex flex-col items-center justify-center px-12 py-6 text-center rotate-y-180">
+                    <div class="absolute w-full h-full backface-hidden back-face bg-white border-2 border-rose-200 rounded-2xl flex flex-col items-center justify-center px-12 py-6 text-center">
                         <!-- 發音播放鈕 (背面) -->
                         <button id="fc-play-back" class="absolute top-4 right-4 text-slate-400 hover:text-indigo-600 bg-slate-100 hover:bg-indigo-50 p-2 rounded-full transition shadow-sm z-10" title="播放發音">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -196,8 +210,8 @@
 
             <!-- 閃卡按鈕區塊 -->
             <div id="fc-controls-front" class="w-full mt-auto">
-                <button id="btn-fc-flip" class="w-full bg-slate-800 text-white py-4 rounded-xl font-bold hover:bg-slate-900 transition flex items-center justify-center gap-2 shadow-md">
-                    🔄 翻開看答案
+                <button id="btn-fc-flip" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 transition flex items-center justify-center gap-2 shadow-md">
+                    翻開看答案
                 </button>
             </div>
             
@@ -241,7 +255,7 @@
             </div>
             
             <div class="mb-4 shrink-0">
-                <select id="history-filter" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2 focus:border-indigo-500 focus:outline-none transition text-slate-700 bg-slate-50">
+                <select id="history-filter" class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-slate-50 font-bold">
                     <option value="all">顯示所有模式</option>
                     <option value="flashcard">📇 閃卡記憶模式</option>
                     <option value="zh-to-jp">🇹🇼 看中文 ➔ 打日文</option>
@@ -277,14 +291,14 @@
             
             <div class="w-full mb-3 shrink-0 flex flex-col sm:flex-row gap-3">
                 <div class="flex-1">
-                    <select id="vocab-level" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2 focus:border-indigo-500 focus:outline-none transition text-slate-700 bg-slate-50 font-bold mb-2 sm:mb-0">
+                    <select id="vocab-level" class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-slate-50 font-bold mb-2 sm:mb-0">
                         <option value="all">全部級別</option>
                         <option value="N5">N5 (入門)</option>
                         <option value="N4">N4 (初級)</option>
                     </select>
                 </div>
                 <div class="flex-1" id="vocab-lesson-container">
-                    <select id="vocab-lesson" class="w-full border-2 border-slate-200 rounded-xl px-4 py-2 focus:border-indigo-500 focus:outline-none transition text-slate-700 bg-slate-50 font-bold">
+                    <select id="vocab-lesson" class="custom-select w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:border-indigo-500 focus:outline-none transition text-base sm:text-lg text-slate-700 bg-slate-50 font-bold">
                         <option value="all">全部</option>
                     </select>
                 </div>
